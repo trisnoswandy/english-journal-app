@@ -1,5 +1,5 @@
 import streamlit as st
-from google import genai
+import google.generativeai as genai
 import pandas as pd
 import plotly.express as px
 from docx import Document
@@ -64,11 +64,9 @@ if menu == "12-Point Journal Evaluator":
         else:
             with st.spinner("Menganalisis teks..."):
                 try:
-                    client = genai.Client(api_key=api_key)
-                    response = client.models.generate_content(
-                        model='gemini-2.5-flash',
-                        contents=f"Bertindaklah sebagai mentor tingkat lanjut. Evaluasi dan perbaiki teks berikut secara komprehensif dalam bahasa Inggris dan Indonesia: {journal_input}"
-                    )
+                    genai.configure(api_key=api_key)
+                    model = genai.GenerativeModel('gemini-1.5-flash')
+                    response = model.generate_content(f"Bertindaklah sebagai mentor tingkat lanjut. Evaluasi dan perbaiki teks berikut secara komprehensif dalam bahasa Inggris dan Indonesia: {journal_input}")
                     st.success("Evaluasi Selesai!")
                     st.markdown(response.text)
                 except Exception as e:
@@ -89,11 +87,9 @@ elif menu == "AI Video Prompt Gen":
         else:
             with st.spinner("Menyusun prompt video..."):
                 try:
-                    client = genai.Client(api_key=api_key)
-                    response = client.models.generate_content(
-                        model='gemini-2.5-flash',
-                        contents=f"Ubah ide ini menjadi prompt video AI yang sinematik: {prompt_input}"
-                    )
+                    genai.configure(api_key=api_key)
+                    model = genai.GenerativeModel('gemini-1.5-flash')
+                    response = model.generate_content(f"Ubah ide ini menjadi prompt video AI yang sinematik: {prompt_input}")
                     st.success("Prompt Berhasil Dibuat!")
                     st.code(response.text, language="markdown")
                 except Exception as e:
