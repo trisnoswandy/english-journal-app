@@ -1,0 +1,12 @@
+{
+  "powermode.enabled": true,
+  "powermode.enableShake": false,
+  "powermode.combo.enabled": false,
+  "powermode.presets": "flames",
+  "powermode.customWidth": 8,
+  "powermode.customHeight": 8,
+  "powermode.customPeakAlpha": 0.6,
+  "powermode.explosionDuration": 250,
+  "powermode.maxParticles": 50,
+  "powermode.particleColor": "#4ade80"
+}
