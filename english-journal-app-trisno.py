@@ -12,7 +12,14 @@ if st.button("Evaluasi Jurnal 🚀"):
         st.warning("Mohon isi API Key dan draf jurnal kamu.")
     else:
         clean_key = api_key.strip()
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={clean_key}"
+        
+        # Kombinasi model dan endpoint versi yang pasti berfungsi
+        endpoints_to_try = [
+            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={clean_key}",
+            f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={clean_key}",
+            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key={clean_key}"
+        ]
+        
         headers = {'Content-Type': 'application/json'}
         payload = {
             "contents": [{
@@ -20,16 +27,25 @@ if st.button("Evaluasi Jurnal 🚀"):
             }]
         }
         
-        try:
-            response = requests.post(url, headers=headers, json=payload)
-            res_data = response.json()
-            
-            if response.status_code == 200 and 'candidates' in res_data:
-                output = res_data['candidates'][0]['content']['parts'][0]['text']
-                st.success("Evaluasi Selesai!")
-                st.write(output)
-            else:
-                err_msg = res_data.get('error', {}).get('message', 'Terjadi kesalahan pada respon API.')
-                st.error(f"Gagal memproses jurnal: {err_msg}")
-        except Exception as e:
-            st.error(f"Koneksi gagal: {e}")
+        success = False
+        last_error = ""
+        
+        for url in endpoints_to_try:
+            try:
+                response = requests.post(url, headers=headers, json=payload)
+                res_data = response.json()
+                
+                if response.status_code == 200 and 'candidates' in res_data:
+                    output = res_data['candidates'][0]['content']['parts'][0]['text']
+                    st.success("Evaluasi Selesai!")
+                    st.write(output)
+                    success = True
+                    break
+                else:
+                    last_error = res_data.get('error', {}).get('message', response.text)
+            except Exception as e:
+                last_error = str(e)
+                continue
+                
+        if not success:
+            st.error(f"Gagal memproses jurnal. Detail eror: {last_error}")
