@@ -53,7 +53,7 @@ st.markdown("Platform Cerdas Pengembang Bahasa Inggris, Riset Perkebunan, & Anal
 if not api_key:
     st.warning("⚠️ Masukkan Gemini API Key Anda di sidebar untuk mengaktifkan fitur AI.")
 
-# Model Flash multimodal berkecepatan tinggi & akurat
+# Menggunakan model Flash multimodal berkecepatan tinggi & stabil
 MODEL_NAME = 'gemini-3.6-flash'
 
 if menu == "12-Point Journal Evaluator":
@@ -75,28 +75,52 @@ if menu == "12-Point Journal Evaluator":
         elif not journal_input and not uploaded_image:
             st.warning("Mohon masukkan teks jurnal atau upload foto screenshot terlebih dahulu.")
         else:
-            with st.spinner("Menganalisis 12 Poin Evaluasi Bahasa Inggris..."):
+            with st.spinner("Menganalisis 12 Poin Evaluasi Jurnal Harian..."):
                 try:
                     client = genai.Client(api_key=api_key)
                     
-                    prompt = """
-                    Bertindaklah sebagai Mentor Bahasa Inggris Profesional. Evaluasi input jurnal pengguna (baik dari teks maupun dari gambar screenshot yang diunggah) secara mendalam dan berikan umpan balik yang terstruktur persis dalam 12 Poin Evaluasi berikut:
+                    system_prompt = """
+                    Bertindaklah sebagai Mentor Bahasa Inggris Pribadi. Evaluasi jurnal pengguna (dari teks atau foto screenshot) dan sajikan hasilnya secara mendalam dan presisi sesuai format 12 Poin Evaluasi berikut:
 
-                    1. **Grammar & Structure Correction** (Perbaikan tata bahasa secara detail beserta penjelasannya)
-                    2. **Vocabulary Enhancement** (Saran pilihan kata/kosakata yang lebih natural/akademis)
-                    3. **Tense Consistency** (Pemeriksaan ketepatan penggunaan tenses)
-                    4. **Spelling & Typos** (Koreksi ejaan dan kesalahan pengetikan)
-                    5. **Punctuation & Capitalization** (Perbaikan tanda baca dan huruf kapital)
-                    6. **Natural Phrasing (Native Style)** (Cara pengungkapan agar terdengar lebih alami seperti penutur asli)
-                    7. **Sentence Complexity & Flow** (Saran perbaikan variasi dan kelancaran alur kalimat)
-                    8. **Tone & Style Analysis** (Analisis nada bahasa: kasual, formal, atau akademis)
-                    9. **Idiomatic & Collocation Suggestions** (Penggunaan frasa, idiom, atau kolokasi kata yang tepat)
-                    10. **Re-written Natural Version** (Versi perbaikan lengkap dalam gaya percakapan alami/casual natural)
-                    11. **Re-written Academic/Professional Version** (Versi perbaikan lengkap dalam format formal/akademis)
-                    12. **Key Actionable Takeaways** (3-5 poin ringkas hal utama yang harus dipelajari dan diperhatikan dari jurnal ini)
+                    1. **Transkripsi Teks & Versi Alami (Natural)**
+                       Menampilkan draf tulisan asli pengguna dan versi perbaikan Bahasa Inggris yang alami (natural English) dalam bentuk paragraf rapi.
+
+                    2. **Kamus Kata-Kata (Siap Salin)**
+                       Daftar kosakata baru dari draf pengguna dalam format rapat (tanpa tabel) beserta arti dan contoh kalimatnya, siap ditempel ke Notion.
+
+                    3. **Bedah Struktur & Pilihan Kata (Word-by-Word Analysis)**
+                       Analisis mendalam mengenai kesalahan tata bahasa (grammar), ejaan, tata kata, serta dilengkapi panduan cara baca fonetiknya.
+
+                    4. **Before vs After Transformation (Transformasi Kalimat)**
+                       Perbandingan langsung antara kalimat kurang tepat pada draf asli dengan versi perbaikannya beserta pelajaran utamanya.
+
+                    5. **Top 3 Vocabulary Focus (3 Kata Kunci Utama)**
+                       Tiga kosakata atau idiom paling penting dari jurnal hari itu yang wajib dihafalkan.
+
+                    6. **Mastered Verb Tracker (Lacak Kata Kerja yang Dikuasai)**
+                       Pelacakan penggunaan perubahan kata kerja (V1, V2, V3) untuk melihat mana yang sudah berhasil dikuasai dan mana yang perlu diperbaiki.
+
+                    7. **Skor & Persentase Ketepatan Mandiri**
+                       Perhitungan akurasi tulisan secara transparan menggunakan formula matematika:
+                       $$\\text{Skor} = \\left( \\frac{\\text{Kata Benar}}{\\text{Total Kata}} \\right) \\times 100\\%$$
+
+                    8. **Pronunciation Challenge (Tantangan Pengucapan)**
+                       Kalimat terpilih dari jurnal untuk dilatih secara lisan, lengkap dengan panduan pengucapan suara alami (natural phonetic guide).
+
+                    9. **Native Phrase of the Day (Ungkapan Gaul Penutur Asli)**
+                       Satu frasa, phrasal verb, atau idiom khas penutur asli beserta contoh penggunaannya dalam kalimat.
+
+                    10. **Evaluasi Jurnal Harian**
+                        Umpan balik ringkas, catatan perkembangan, dan apresiasi atas alur cerita jurnal pengguna.
+
+                    11. **Daily Micro-Question (Pertanyaan Tematik Hari Ini)**
+                        Satu pertanyaan singkat berbahasa Inggris yang relevan dengan topik jurnal untuk melatih kemampuan merespons cepat.
+
+                    12. **Sesi Belajar Singkat (Materi & Latihan Soal)**
+                        Pembahasan materi dasar secara berurutan (6 Poin Fondasi) menggunakan siklus 3 hari pengulangan per materi, diakhiri dengan 3 latihan soal singkat.
                     """
 
-                    contents_payload = [prompt]
+                    contents_payload = [system_prompt]
                     if journal_input:
                         contents_payload.append(f"\nTeks Jurnal Input:\n{journal_input}")
                     if uploaded_image:
