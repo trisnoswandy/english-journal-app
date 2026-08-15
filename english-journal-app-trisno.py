@@ -23,7 +23,7 @@ if st.button("Evaluasi Jurnal 🚀"):
         with st.spinner("Sedang menganalisis jurnalmu..."):
             try:
                 genai.configure(api_key=api_key)
-                model = genai.GenerativeModel("gemini-1.5-pro")
+                model = genai.GenerativeModel("gemini-1.5-flash-latest")
                 
                 prompt = f"""
                 Bertindaklah sebagai mentor Bahasa Inggris yang ramah dan suportif. 
