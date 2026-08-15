@@ -76,14 +76,11 @@ def create_docx_file(content, title="Exported_Document"):
     doc.save(bio)
     return bio.getvalue()
 
-# Menggunakan model gemini-3.7-flash dengan konfigurasi pemikiran (thinking_level)
+# Menggunakan model gemini-3.7-flash secara bersih dan aman
 def get_fast_ai_response(prompt, api_key):
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel(
-            model_name='gemini-3.7-flash',
-            generation_config={"thinking_level": "medium"}  # Parameter standar untuk Gemini 3.7
-        )
+        model = genai.GenerativeModel('gemini-3.7-flash')
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
@@ -149,9 +146,6 @@ elif menu == "AI Video Prompt Gen":
 
 st.markdown("""
     <div class='footer'>
-        Developed with ⚡ by <b>Trisno Swandy Simanullang</b>
-    </div>
-    """, unsafe_allow_html=True)
         Developed with ⚡ by <b>Trisno Swandy Simanullang</b>
     </div>
     """, unsafe_allow_html=True)
