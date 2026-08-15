@@ -1,40 +1,33 @@
 import streamlit as st
-import google.generativeai as genai
+import requests
 
-st.set_page_config(page_title="English Journal Evaluator", page_icon="📝")
-
-st.title("📝 AI English Journal Evaluator")
+st.title("📄 AI English Journal Evaluator")
 st.write("Masukkan jurnal harianmu untuk mendapatkan evaluasi otomatis 12 Poin!")
 
-# Ambil API Key dari Streamlit Secrets
-api_key = st.secrets.get("GEMINI_API_KEY", "")
-
-if not api_key:
-    api_key = st.text_input("Masukkan Gemini API Key kamu:", type="password")
-
-journal_text = st.text_area("Tulis draf jurnalmu di sini (Bahasa Indonesia & Inggris):", height=150)
+api_key = st.text_input("Masukkan Gemini API Key kamu:", type="password")
+journal_text = st.text_area("Tulis draf jurnalmu di sini (Bahasa Indonesia & Inggris):")
 
 if st.button("Evaluasi Jurnal 🚀"):
-    if not api_key:
-        st.error("Silakan masukkan Gemini API Key terlebih dahulu!")
-    elif not journal_text:
-        st.warning("Tuliskan jurnalmu sebelum mengeklik tombol evaluasi.")
+    if not api_key or not journal_text:
+        st.warning("Mohon isi API Key dan draf jurnal kamu.")
     else:
-        with st.spinner("Sedang menganalisis jurnalmu..."):
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+        headers = {'Content-Type': 'application/json'}
+        payload = {
+            "contents": [{
+                "parts": [{"text": f"Evaluasi jurnal berikut dalam 12 poin:\n\n{journal_text}"}]
+            }]
+        }
+        
+        response = requests.post(url, headers=headers, json=payload)
+        
+        if response.status_code == 200:
+            result = response.json()
             try:
-                genai.configure(api_key=api_key)
-                model = genai.GenerativeModel("gemini-1.5-flash-latest")
-                
-                prompt = f"""
-                Bertindaklah sebagai mentor Bahasa Inggris yang ramah dan suportif. 
-                Evaluasi jurnal berikut menggunakan struktur 12 Poin (Transkripsi & Versi Alami, Kamus Kata Siap Salin, Bedah Struktur, Before vs After, Top 3 Vocab, Mastered Verb Tracker, Skor Ketepatan, Pronunciation Challenge, Native Phrase, Evaluasi Jurnal, Micro-Question, dan Sesi Belajar Singkat).
-
-                Draf Jurnal:
-                {journal_text}
-                """
-                
-                response = model.generate_content(prompt)
-                st.markdown("---")
-                st.markdown(response.text)
-            except Exception as e:
-                st.error(f"Terjadi kesalahan: {e}")
+                output = result['candidates'][0]['content']['parts'][0]['text']
+                st.success("Evaluasi Selesai!")
+                st.write(output)
+            except Key:
+                st.error("Gagal membaca respon dari API.")
+        else:
+            st.error(f"Terjadi kesalahan: {response.status_code} - {response.text}")
