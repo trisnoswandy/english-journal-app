@@ -1,51 +1,35 @@
-import streamlit as st
-import requests
+Buatkan aplikasi web interaktif berbasis Streamlit/Python untuk pendamping belajar Bahasa Inggris harian dan jurnal otomatis berbasis AI. Desain aplikasi dibuat simpel, modern, dan menggunakan tema warna futuristik (dark mode dengan aksen cyan/neon blue). Tambahkan icon-icon modern, efek visual yang bersih, dan animasi loading bernuansa futuristik saat AI sedang memproses data.
 
-st.title("📄 Evaluator Jurnal Bahasa Inggris AI")
-st.write("Masukkan jurnal harianmu untuk mendapatkan evaluasi otomatis 12 Poin!")
+Aplikasi ini harus memiliki fitur-fitur utama sebagai berikut:
 
-api_key = st.text_input("Masukkan Kunci API Gemini kamu:", type="password")
-journal_text = st.text_area("Tulis draf jurnalmu di sini (Bahasa Indonesia & Inggris):")
+1. Fitur Generator Evaluasi Jurnal (12-Point Journal Evaluator):
+   - Input draf jurnal harian (teks Bahasa Indonesia & Inggris).
+   - Opsi Pengaturan Output:
+     * Opsi mengatur jumlah variasi/opsi perbaikan (1, 2, atau 3 versi).
+     * Opsi pilihan gaya bahasa (Casual/Daily, Professional/Formal, Native Conversational, Slang/Street English).
+     * Opsi panjang tulisan/umpan balik (Ringkas/Compact, Sedang, Detail/Komprehensif).
+   - Output otomatis memuat 12 Poin Evaluasi Terstruktur:
+     1) Transkripsi Teks & Versi Alami (Natural)
+     2) Kamus Kata-Kata (Siap Salin ke Notion)
+     3) Bedah Struktur & Pilihan Kata (Word-by-Word Analysis)
+     4) Before vs After Transformation
+     5) Top 3 Vocabulary Focus
+     6) Mastered Verb Tracker
+     7) Skor & Persentase Ketepatan Mandiri
+     8) Pronunciation Challenge (Tantangan Pengucapan & Panduan Fonetik)
+     9) Native Phrase of the Day
+     10) Evaluasi Jurnal Harian
+     11) Daily Micro-Question
+     12) Sesi Belajar Singkat (Materi Fondasi & 3 Latihan Soal)
+   - Tombol "Salin Teks" (Copy to Clipboard) satu klik untuk memudahkan menyalin hasil ke Notion/Catatan.
+   - Tombol "Export ke Word (.docx)" untuk mengunduh rekap evaluasi jurnal ke dalam file Microsoft Word.
 
-if st.button("Evaluasi Jurnal 🚀"):
-    if not api_key or not journal_text:
-        st.warning("Mohon isi API Key dan draf jurnal kamu.")
-    else:
-        clean_key = api_key.strip()
-        
-        # Kombinasi model dan endpoint versi yang pasti berfungsi
-        endpoints_to_try = [
-            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={clean_key}",
-            f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={clean_key}",
-            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key={clean_key}"
-        ]
-        
-        headers = {'Content-Type': 'application/json'}
-        payload = {
-            "contents": [{
-                "parts": [{"text": f"Evaluasi jurnal berikut dalam 12 poin:\n\n{journal_text}"}]
-            }]
-        }
-        
-        success = False
-        last_error = ""
-        
-        for url in endpoints_to_try:
-            try:
-                response = requests.post(url, headers=headers, json=payload)
-                res_data = response.json()
-                
-                if response.status_code == 200 and 'candidates' in res_data:
-                    output = res_data['candidates'][0]['content']['parts'][0]['text']
-                    st.success("Evaluasi Selesai!")
-                    st.write(output)
-                    success = True
-                    break
-                else:
-                    last_error = res_data.get('error', {}).get('message', response.text)
-            except Exception as e:
-                last_error = str(e)
-                continue
-                
-        if not success:
-            st.error(f"Gagal memproses jurnal. Detail eror: {last_error}")
+2. Fitur Pelacak & Perencana Progres Belajar (English Learning & Target Planner):
+   - Mode Pelacak Waktu & Target: Pilihan tampilan target harian, mingguan, dan bulanan (misal: target jumlah kosakata baru, jumlah hari streak, target jam latihan).
+   - Fitur Planning Belajar: Papan rencana target mingguan/bulanan (misal: minggu ini fokus pada Past Tense & Phrasal Verbs, target 30 kosakata).
+   - Visualisasi ringkas/grafik kemajuan persentase skor akurasi jurnal dari hari ke hari.
+
+3. Fitur Prompt Generator Video AI (Google Veo / Sora) untuk Latihan Visualisasi:
+   - Fitur pembuat prompt video visual bernuansa futuristik untuk membantu visualisasi kosakata/cerita jurnal dalam bentuk video AI (Google Veo).
+   - Menghasilkan prompt bahasa Inggris yang konsisten untuk pergerakan kamera, pencahayaan, gaya visual (cinematic/photorealistic), dan deskripsi subjek secara detail.
+   - Fitur "Copy Prompt" dan "Export Prompt to Word".
