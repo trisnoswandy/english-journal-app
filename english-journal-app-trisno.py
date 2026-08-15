@@ -1,5 +1,5 @@
 import streamlit as st
-import requests
+from google import genai
 
 st.title("📄 AI English Journal Evaluator")
 st.write("Masukkan jurnal harianmu untuk mendapatkan evaluasi otomatis 12 Poin!")
@@ -11,23 +11,17 @@ if st.button("Evaluasi Jurnal 🚀"):
     if not api_key or not journal_text:
         st.warning("Mohon isi API Key dan draf jurnal kamu.")
     else:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
-        headers = {'Content-Type': 'application/json'}
-        payload = {
-            "contents": [{
-                "parts": [{"text": f"Evaluasi jurnal berikut dalam 12 poin:\n\n{journal_text}"}]
-            }]
-        }
-        
-        response = requests.post(url, headers=headers, json=payload)
-        
-        if response.status_code == 200:
-            result = response.json()
-            try:
-                output = result['candidates'][0]['content']['parts'][0]['text']
-                st.success("Evaluasi Selesai!")
-                st.write(output)
-            except Key:
-                st.error("Gagal membaca respon dari API.")
-        else:
-            st.error(f"Terjadi kesalahan: {response.status_code} - {response.text}")
+        try:
+            # Menginisialisasi client dengan SDK google-genai terbaru
+            client = genai.Client(api_key=api_key)
+            
+            # Memanggil model gemini-2.0-flash
+            response = client.models.generate_content(
+                model='gemini-2.0-flash',
+                contents=f"Evaluasi jurnal berikut dalam 12 poin:\n\n{journal_text}",
+            )
+            
+            st.success("Evaluasi Selesai!")
+            st.write(response.text)
+        except Exception as e:
+            st.error(f"Terjadi kesalahan: {e}")
