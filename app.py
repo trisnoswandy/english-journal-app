@@ -54,7 +54,7 @@ if not api_key:
     st.warning("⚠️ Masukkan Gemini API Key Anda di sidebar untuk mengaktifkan fitur AI.")
 
 # Model Flash multimodal berkecepatan tinggi & akurat
-MODEL_NAME = 'gemini-2.5-flash'
+MODEL_NAME = 'gemini-3.6-flash'
 
 if menu == "12-Point Journal Evaluator":
     st.header("📝 12-Point Journal Evaluator (Teks & Gambar SS)")
