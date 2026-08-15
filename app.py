@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 # ==========================================
 # 1. KONFIGURASI HALAMAN & BACKGROUND BERPOLA
 # ==========================================
-st.set_page_config(page_title="Trisno's Neo-Analytics Hub", page_icon="⚡", layout="wide")
+st.set_page_config(page_title="English learning website", page_icon="🌴", layout="wide")
 
 # CSS Custom: Latar belakang dengan pola grid / garis-garis futuristik & neon
 custom_css = """
@@ -78,19 +78,19 @@ st.markdown(custom_css, unsafe_allow_html=True)
 # 2. SIDEBAR & MENU NAVIGASI
 # ==========================================
 with st.sidebar:
-    st.markdown("### ⚡ NEO-ANALYTICS HUB")
+    st.markdown("### 🌴 English learning website")
     st.caption("Intelligence & Data Platform")
     st.markdown("---")
     
     api_key = st.text_input("Gemini API Key", type="password", placeholder="api_key_anda")
     menu = st.radio("Navigate:", ["12-Point Journal Evaluator", "Progress & Target Planner", "AI Video Prompt Gen"])
     st.markdown("---")
-    st.markdown("👨‍💻 **Trisno Swandy Simanullang**")
+    st.markdown("👤 **Trisno Swandy Simanullang**")
 
 # ==========================================
 # HEADER UTAMA
 # ==========================================
-st.title("⚡ Trisno's Neo-Analytics Hub")
+st.title("🌴 Trisno's English learning website")
 st.markdown("Platform Cerdas Pengembang Bahasa Inggris, Riset Perkebunan, & Analisis Pasar.")
 
 if not api_key:
@@ -112,7 +112,6 @@ if menu == "12-Point Journal Evaluator":
             with st.spinner("Menganalisis teks dengan kecerdasan buatan..."):
                 try:
                     genai.configure(api_key=api_key)
-                    # Menggunakan model gemini-1.5-pro yang stabil dan terhindar dari error kuota 3.7/2.5
                     model = genai.GenerativeModel('gemini-1.5-pro')
                     response = model.generate_content(f"Bertindaklah sebagai mentor tingkat lanjut. Evaluasi dan perbaiki teks berikut secara komprehensif dalam bahasa Inggris dan Indonesia: {journal_input}")
                     st.success("Evaluasi Selesai!")
