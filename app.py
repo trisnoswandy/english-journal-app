@@ -8,16 +8,21 @@ import time
 from datetime import datetime, timedelta
 
 # ==========================================
-# 1. KONFIGURASI HALAMAN & TEMA AGRI-TRADER CYBER
+# 1. KONFIGURASI HALAMAN & BACKGROUND BERPOLA
 # ==========================================
-st.set_page_config(page_title="Trisno's Neo-Analytics Hub", page_icon="⚡", layout="wide")
+st.set_page_config(page_title="Trisno's Neo-Analytics Hub", page_icon="🌴", layout="wide")
 
-# CSS Custom: Tema Dark Modern dengan Kombinasi Neon Hijau Agri & Cyan Finansial
+# CSS Custom: Latar belakang dengan pola grid / garis-garis futuristik & neon
 custom_css = """
 <style>
-    /* Latar Belakang Gelap Elegan */
+    /* Latar Belakang Utama dengan Efek Pola Grid Cyber / Garis Abstrak */
     .stApp {
-        background: linear-gradient(135deg, #050b14 0%, #0f172a 100%);
+        background-color: #050b14;
+        background-image: 
+            radial-gradient(circle at 50% 10%, rgba(0, 255, 170, 0.08) 0%, transparent 60%),
+            linear-gradient(rgba(0, 255, 170, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 255, 170, 0.03) 1px, transparent 1px);
+        background-size: 100% 100%, 40px 40px, 40px 40px;
         color: #f1f5f9;
     }
     
@@ -27,16 +32,17 @@ custom_css = """
         left: 0;
         bottom: 0;
         width: 100%;
-        background-color: #050b14;
+        background-color: rgba(5, 11, 20, 0.95);
         color: #94a3b8;
         text-align: center;
         padding: 10px;
         font-size: 12px;
         border-top: 1px solid #1e293b;
         z-index: 100;
+        backdrop-filter: blur(5px);
     }
 
-    /* Heading dengan Efek Neon Hijau & Cyan */
+    /* Heading dengan Efek Neon Hijau */
     h1, h2, h3 { 
         color: #00ffaa !important; 
         font-family: 'Courier New', Courier, monospace;
@@ -45,7 +51,7 @@ custom_css = """
     
     /* Tombol Interaktif */
     .stButton>button {
-        background-color: transparent !important;
+        background-color: rgba(0, 255, 170, 0.05) !important;
         color: #00ffaa !important;
         border: 1px solid #00ffaa !important;
         border-radius: 8px;
@@ -61,7 +67,7 @@ custom_css = """
 
     /* Kotak Input & Text Area */
     .stTextInput>div>div>input, .stTextArea>div>div>textarea {
-        background-color: #0f172a !important;
+        background-color: rgba(15, 23, 42, 0.8) !important;
         color: #38bdf8 !important;
         border: 1px solid #334155 !important;
     }
@@ -77,19 +83,19 @@ st.markdown(custom_css, unsafe_allow_html=True)
 # 2. SIDEBAR & MENU NAVIGASI
 # ==========================================
 with st.sidebar:
-    st.markdown("### ⚡ NEO-ANALYTICS HUB")
-    st.caption("Agri-Tech & Financial Intelligence")
+    st.markdown("### 🌴 NEO-ANALYTICS HUB")
+    st.caption("Intelligence & Data Platform")
     st.markdown("---")
     
     api_key = st.text_input("Gemini API Key", type="password", placeholder="api_key_anda")
     menu = st.radio("Navigate:", ["12-Point Journal Evaluator", "Progress & Target Planner", "AI Video Prompt Gen"])
     st.markdown("---")
-    st.markdown("👨‍💻 **Trisno Swandy S.**")
+    st.markdown("👨‍💻 **Trisno Swandy Simanullang**")
 
 # ==========================================
 # HEADER UTAMA
 # ==========================================
-st.title("⚡ Trisno's Neo-Analytics Hub")
+st.title("🌴 Trisno's Neo-Analytics Hub")
 st.markdown("Platform Cerdas Pengembang Bahasa Inggris, Riset Perkebunan, & Analisis Pasar.")
 
 if not api_key:
@@ -110,7 +116,7 @@ if menu == "12-Point Journal Evaluator":
         else:
             with st.spinner("Menganalisis teks dengan kecerdasan buatan..."):
                 genai.configure(api_key=api_key)
-                model = genai.GenerativeModel('gemini-2.5-flash')
+                model = genai.GenerativeModel('gemini-3.7-flash')
                 response = model.generate_content(f"Bertindaklah sebagai mentor tingkat lanjut. Evaluasi dan perbaiki teks berikut secara komprehensif dalam bahasa Inggris dan Indonesia: {journal_input}")
                 st.success("Evaluasi Selesai!")
                 st.markdown(response.text)
