@@ -80,12 +80,11 @@ def create_docx_file(content, title="Exported_Document"):
     doc.save(bio)
     return bio.getvalue()
 
-# Fungsi pemanggilan AI yang diperbarui menggunakan model 'gemini-1.5-flash' secara aman
+# Fungsi pemanggilan AI menggunakan model 'gemini-2.5-flash' terbaru
 def get_fast_ai_response(prompt, api_key):
     try:
         genai.configure(api_key=api_key)
-        # Menggunakan nama model standar yang didukung penuh
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-2.5-flash')
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
