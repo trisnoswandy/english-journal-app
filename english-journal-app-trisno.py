@@ -43,3 +43,7 @@ if st.button("Evaluasi Jurnal 🚀"):
 
         if not success:
             st.error("Gagal memproses jurnal. Pastikan API Key yang dimasukkan benar dan aktif.")
+                continue
+
+        if not success:
+            st.error("Gagal memproses jurnal. Pastikan API Key yang dimasukkan benar dan aktif.")
