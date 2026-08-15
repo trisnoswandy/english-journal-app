@@ -91,7 +91,7 @@ elif menu == "AI Video Prompt Gen":
                 try:
                     client = genai.Client(api_key=api_key)
                     response = client.models.generate_content(
-                        model='gemini-2.5-flash',
+                        model='gemini-3.7-flash',
                         contents=f"Ubah ide ini menjadi prompt video AI yang sinematik: {prompt_input}"
                     )
                     st.success("Prompt Berhasil Dibuat!")
