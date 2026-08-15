@@ -86,7 +86,7 @@ def get_gemini_response(prompt, api_key):
     try:
         genai.configure(api_key=api_key)
         # Menggunakan model gemini-2.5-flash
-        model = genai.GenerativeModel('gemini-2.5-flash')
+        model = genai.GenerativeModel('gemini-3.7-flash')
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
