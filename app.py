@@ -1,16 +1,19 @@
 import streamlit as st
 import google.generativeai as genai
 import pandas as pd
+import plotly.express as px
 from docx import Document
 from io import BytesIO
 from PIL import Image
+import time
+from datetime import datetime, timedelta
 
 # ==========================================
 # 1. KONFIGURASI HALAMAN & TEMA CEPAT
 # ==========================================
 st.set_page_config(page_title="English learning website", page_icon="🌴", layout="wide")
 
-# CSS Custom: Tema Neon Hijau & Latarmotif Grid Halus
+# CSS Custom: Tema Neon Hijau & Estetika Cyber-Grid
 custom_css = """
 <style>
     .stApp {
@@ -69,7 +72,7 @@ custom_css = """
 st.markdown(custom_css, unsafe_allow_html=True)
 
 # ==========================================
-# 2. FUNGSI OPTIMASI & AI VISION
+# 2. FUNGSI OPTIMASI & AI MULTIMODAL
 # ==========================================
 @st.cache_data
 def create_docx_file(content, title="Exported_Document"):
@@ -80,13 +83,14 @@ def create_docx_file(content, title="Exported_Document"):
     doc.save(bio)
     return bio.getvalue()
 
-def get_ai_response_with_image(prompt, image, api_key):
+def get_fast_ai_response(prompt, api_key, image_file=None):
     try:
         genai.configure(api_key=api_key)
-        # Menggunakan model multimodal agar bisa membaca gambar screenshot
-        model = genai.GenerativeModel('gemini-2.5-flash')
-        if image:
-            response = model.generate_content([prompt, image])
+        # Menggunakan model gemini-1.5-flash yang stabil dan mendukung gambar
+        model = genai.GenerativeModel('gemini-3.7-flash')
+        
+        if image_file:
+            response = model.generate_content([prompt, image_file])
         else:
             response = model.generate_content(prompt)
         return response.text
@@ -116,51 +120,49 @@ if not api_key and menu != "Progress & Target Planner":
     st.warning("⚠️ Masukkan Gemini API Key Anda di sidebar untuk mengaktifkan modul AI.")
 
 # ==========================================
-# MODULE 1: 12-POINT JOURNAL EVALUATOR (DENGAN UPLOAD SCREENSHOT)
+# MODULE 1: 12-POINT JOURNAL EVALUATOR
 # ==========================================
 if menu == "12-Point Journal Evaluator":
     st.header("📝 12-Point Journal Evaluator")
-    st.markdown("Ketik teks jurnal Anda secara manual ATAU **upload screenshot (SS)** catatan cerita harian Anda dari galeri.")
-
-    # Pilihan metode input: Ketik atau Upload Gambar
-    input_method = st.radio("Pilih Metode Input:", ["Ketik Teks Manual", "Upload Screenshot dari Galeri"], horizontal=True)
+    st.markdown("Ketik teks jurnal Anda secara manual ATAU upload screenshot (SS) catatan cerita harian Anda dari galeri.")
+    
+    # Pilihan Metode Input
+    input_method = st.radio("Pilih Metode Input:", ["Ketik Teks Manual", "Upload Screenshot dari Galeri"])
     
     journal_input = ""
     uploaded_image = None
-
+    
     if input_method == "Ketik Teks Manual":
-        journal_input = st.text_area("Input Jurnal / Catatan Riset (ID/EN):", height=150, placeholder="Tuliskan catatan harian atau jurnal Anda di sini...")
+        journal_input = st.text_area("Input Jurnal / Catatan Riset (ID/EN):", height=180, placeholder="Tuliskan catatan harian atau jurnal Anda di sini...")
     else:
-        uploaded_image = st.file_uploader("Pilih file gambar screenshot (PNG, JPG, JPEG):", type=["png", "jpg", "jpeg"])
+        # Tombol ini otomatis membuka galeri/kamera saat diakses via HP
+        uploaded_image = st.file_uploader("Pilih gambar dari galeri HP:", type=["jpg", "jpeg", "png"])
         if uploaded_image:
-            # Tampilkan preview gambar di layar
-            image_display = Image.open(uploaded_image)
-            st.image(image_display, caption="Preview Screenshot Jurnal Anda", use_column_width=True)
+            image = Image.open(uploaded_image)
+            st.image(image, caption="Gambar yang di-upload", width=300)
+            journal_input = "Tolong baca teks yang ada di dalam gambar screenshot ini, lalu evaluasi."
 
     if st.button("🚀 INITIATE EVALUATION"):
         if not api_key:
             st.error("API Key belum dimasukkan!")
-        elif input_method == "Ketik Teks Manual" and not journal_input:
-            st.warning("Mohon isi teks jurnal terlebih dahulu.")
-        elif input_method == "Upload Screenshot dari Galeri" and not uploaded_image:
-            st.warning("Mohon upload file gambar screenshot terlebih dahulu.")
+        elif not journal_input and not uploaded_image:
+            st.warning("Mohon isi teks atau upload gambar terlebih dahulu.")
         else:
-            with st.spinner("⚡ AI sedang membaca gambar dan memproses data..."):
-                img_obj = Image.open(uploaded_image) if uploaded_image else None
-                
+            with st.spinner("⚡ AI sedang membaca dan memproses data..."):
                 prompt = f"""
-                Bertindaklah sebagai mentor Bahasa Inggris profesional. 
-                Tugasmu adalah membaca teks dari gambar screenshot yang di-upload (atau teks berikut: "{journal_input}"), 
-                kemudian evaluasi dan perbaiki cerita/jurnal tersebut secara komprehensif dalam 12 poin (Bahasa Indonesia & Inggris).
+                Bertindaklah sebagai mentor Bahasa Inggris profesional. Evaluasi teks atau gambar catatan berikut secara komprehensif dalam 12 poin (Bahasa Indonesia & Inggris):
+                Teks/Konteks: "{journal_input}"
                 """
                 
-                result = get_ai_response_with_image(prompt, img_obj, api_key)
-                st.success("✅ Evaluasi & Pembacaan Screenshot Selesai!")
+                img_obj = Image.open(uploaded_image) if uploaded_image else None
+                result = get_fast_ai_response(prompt, api_key, img_obj)
+                
+                st.success("✅ Evaluasi & Pembacaan Selesai!")
                 st.markdown(result)
                 
                 # Tombol Export Word instan
-                docx_data = create_docx_file(result, "Journal_Evaluation_From_Image")
-                st.download_button("📄 Export ke Word (.docx)", data=docx_data, file_name="Evaluasi_Jurnal_SS.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+                docx_data = create_docx_file(result, "Journal_Evaluation")
+                st.download_button("📄 Export ke Word (.docx)", data=docx_data, file_name="Evaluasi_Jurnal.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
 # ==========================================
 # MODULE 2: PROGRESS PLANNER
@@ -168,7 +170,7 @@ if menu == "12-Point Journal Evaluator":
 elif menu == "Progress & Target Planner":
     st.header("📈 Progress & Target Planner")
     st.info("Pantau target harian dan kosakata Anda secara real-time.")
-    st.text_area("Target & Fokus Belajar:", "1. Konsistensi Jurnal Harian & Screenshot\n2. Penguasaan Kosakata Perkebunan & Pasar\n3. Analisis Statistik", height=120)
+    st.text_area("Target & Fokus Belajar:", "1. Konsistensi Jurnal Harian\n2. Penguasaan Kosakata Perkebunan & Pasar\n3. Analisis Statistik", height=120)
 
 # ==========================================
 # MODULE 3: AI VIDEO PROMPT GEN
@@ -184,7 +186,7 @@ elif menu == "AI Video Prompt Gen":
         else:
             with st.spinner("🌀 Menyusun prompt video..."):
                 ai_prompt = f"Ubah ide ini menjadi prompt video AI yang sinematik: {prompt_input}"
-                result_prompt = get_ai_response_with_image(ai_prompt, None, api_key)
+                result_prompt = get_fast_ai_response(ai_prompt, api_key)
                 st.success("Prompt Berhasil Dibuat!")
                 st.code(result_prompt, language="markdown")
 
