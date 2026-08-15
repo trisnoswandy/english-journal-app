@@ -11,8 +11,14 @@ if st.button("Evaluasi Jurnal 🚀"):
     if not api_key or not journal_text:
         st.warning("Mohon isi API Key dan draf jurnal kamu.")
     else:
-        # Menggunakan REST API endpoint paling kompatibel
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={api_key.strip()}"
+        # Daftar nama model resmi yang didukung Google AI Studio
+        models_to_try = [
+            "gemini-1.5-flash",
+            "gemini-2.0-flash",
+            "gemini-1.5-pro"
+        ]
+        
+        success = False
         headers = {'Content-Type': 'application/json'}
         payload = {
             "contents": [{
@@ -20,15 +26,20 @@ if st.button("Evaluasi Jurnal 🚀"):
             }]
         }
         
-        try:
-            response = requests.post(url, headers=headers, json=payload)
-            res_data = response.json()
-            
-            if response.status_code == 200:
-                output = res_data['candidates'][0]['content']['parts'][0]['text']
-                st.success("Evaluasi Selesai!")
-                st.write(output)
-            else:
-                st.error(f"Terjadi kesalahan: {res_data.get('error', {}).get('message', response.text)}")
-        except Exception as e:
-            st.error(f"Gagal menghubungkan ke layanan: {e}")
+        for model_name in models_to_try:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key.strip()}"
+            try:
+                response = requests.post(url, headers=headers, json=payload)
+                res_data = response.json()
+                
+                if response.status_code == 200 and 'candidates' in res_data:
+                    output = res_data['candidates'][0]['content']['parts'][0]['text']
+                    st.success(f"Evaluasi Selesai (Menggunakan model: {model_name})!")
+                    st.write(output)
+                    success = True
+                    break
+            except Exception:
+                continue
+
+        if not success:
+            st.error("Gagal memproses jurnal. Pastikan API Key yang dimasukkan benar dan aktif.")
