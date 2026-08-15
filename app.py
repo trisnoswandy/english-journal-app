@@ -1,5 +1,6 @@
 import streamlit as st
-import google.generativeai as genai
+from google import genai
+from PIL import Image
 import pandas as pd
 import plotly.express as px
 from docx import Document
@@ -52,23 +53,62 @@ st.markdown("Platform Cerdas Pengembang Bahasa Inggris, Riset Perkebunan, & Anal
 if not api_key:
     st.warning("⚠️ Masukkan Gemini API Key Anda di sidebar untuk mengaktifkan fitur AI.")
 
+# Model Flash multimodal berkecepatan tinggi & akurat
+MODEL_NAME = 'gemini-2.5-flash'
+
 if menu == "12-Point Journal Evaluator":
-    st.header("📝 12-Point Journal Evaluator")
-    journal_input = st.text_area("Input Jurnal / Catatan Riset (ID/EN):", height=200)
+    st.header("📝 12-Point Journal Evaluator (Teks & Gambar SS)")
+    
+    col1, col2 = st.columns([1, 1])
+    
+    with col1:
+        journal_input = st.text_area("Input Teks Jurnal / Catatan Riset (ID/EN):", height=180)
+    with col2:
+        uploaded_image = st.file_uploader("Upload Foto / Screenshots Jurnal (PNG, JPG, JPEG):", type=["png", "jpg", "jpeg"])
+        if uploaded_image:
+            image_preview = Image.open(uploaded_image)
+            st.image(image_preview, caption="Preview Foto SS Jurnal", use_container_width=True)
     
     if st.button("🚀 INITIATE EVALUATION"):
         if not api_key:
-            st.error("API Key belum dimasukkan!")
-        elif not journal_input:
-            st.warning("Mohon isi teks terlebih dahulu.")
+            st.error("API Key belum dimasukkan di sidebar!")
+        elif not journal_input and not uploaded_image:
+            st.warning("Mohon masukkan teks jurnal atau upload foto screenshot terlebih dahulu.")
         else:
-            with st.spinner("Menganalisis teks dengan Gemini 3.6 Flash..."):
+            with st.spinner("Menganalisis 12 Poin Evaluasi Bahasa Inggris..."):
                 try:
-                    genai.configure(api_key=api_key)
-                    # Menggunakan model gemini-3.6-flash terbaru
-                    model = genai.GenerativeModel('gemini-3.6-flash')
-                    response = model.generate_content(f"Bertindaklah sebagai mentor tingkat lanjut. Evaluasi dan perbaiki teks berikut secara komprehensif dalam bahasa Inggris dan Indonesia: {journal_input}")
-                    st.success("Evaluasi Selesai!")
+                    client = genai.Client(api_key=api_key)
+                    
+                    prompt = """
+                    Bertindaklah sebagai Mentor Bahasa Inggris Profesional. Evaluasi input jurnal pengguna (baik dari teks maupun dari gambar screenshot yang diunggah) secara mendalam dan berikan umpan balik yang terstruktur persis dalam 12 Poin Evaluasi berikut:
+
+                    1. **Grammar & Structure Correction** (Perbaikan tata bahasa secara detail beserta penjelasannya)
+                    2. **Vocabulary Enhancement** (Saran pilihan kata/kosakata yang lebih natural/akademis)
+                    3. **Tense Consistency** (Pemeriksaan ketepatan penggunaan tenses)
+                    4. **Spelling & Typos** (Koreksi ejaan dan kesalahan pengetikan)
+                    5. **Punctuation & Capitalization** (Perbaikan tanda baca dan huruf kapital)
+                    6. **Natural Phrasing (Native Style)** (Cara pengungkapan agar terdengar lebih alami seperti penutur asli)
+                    7. **Sentence Complexity & Flow** (Saran perbaikan variasi dan kelancaran alur kalimat)
+                    8. **Tone & Style Analysis** (Analisis nada bahasa: kasual, formal, atau akademis)
+                    9. **Idiomatic & Collocation Suggestions** (Penggunaan frasa, idiom, atau kolokasi kata yang tepat)
+                    10. **Re-written Natural Version** (Versi perbaikan lengkap dalam gaya percakapan alami/casual natural)
+                    11. **Re-written Academic/Professional Version** (Versi perbaikan lengkap dalam format formal/akademis)
+                    12. **Key Actionable Takeaways** (3-5 poin ringkas hal utama yang harus dipelajari dan diperhatikan dari jurnal ini)
+                    """
+
+                    contents_payload = [prompt]
+                    if journal_input:
+                        contents_payload.append(f"\nTeks Jurnal Input:\n{journal_input}")
+                    if uploaded_image:
+                        image_obj = Image.open(uploaded_image)
+                        contents_payload.append(image_obj)
+
+                    response = client.models.generate_content(
+                        model=MODEL_NAME,
+                        contents=contents_payload
+                    )
+                    
+                    st.success("Evaluasi 12 Poin Selesai!")
                     st.markdown(response.text)
                 except Exception as e:
                     st.error(f"Terjadi kesalahan: {str(e)}")
@@ -88,9 +128,11 @@ elif menu == "AI Video Prompt Gen":
         else:
             with st.spinner("Menyusun prompt video..."):
                 try:
-                    genai.configure(api_key=api_key)
-                    model = genai.GenerativeModel('gemini-3.6-flash')
-                    response = model.generate_content(f"Ubah ide ini menjadi prompt video AI yang sinematik: {prompt_input}")
+                    client = genai.Client(api_key=api_key)
+                    response = client.models.generate_content(
+                        model=MODEL_NAME,
+                        contents=f"Ubah ide ini menjadi prompt video AI yang sinematik: {prompt_input}"
+                    )
                     st.success("Prompt Berhasil Dibuat!")
                     st.code(response.text, language="markdown")
                 except Exception as e:
