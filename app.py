@@ -83,7 +83,7 @@ st.markdown(custom_css, unsafe_allow_html=True)
 # 2. SIDEBAR & MENU NAVIGASI
 # ==========================================
 with st.sidebar:
-    st.markdown("### 🌴 NEO-ANALYTICS HUB")
+    st.markdown("### 🌴 English learning website")
     st.caption("Intelligence & Data Platform")
     st.markdown("---")
     
@@ -95,7 +95,7 @@ with st.sidebar:
 # ==========================================
 # HEADER UTAMA
 # ==========================================
-st.title("🌴 Trisno's Neo-Analytics Hub")
+st.title("🌴 Trisno's English learning website")
 st.markdown("Platform Cerdas Pengembang Bahasa Inggris, Riset Perkebunan, & Analisis Pasar.")
 
 if not api_key:
