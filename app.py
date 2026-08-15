@@ -4,8 +4,6 @@ import pandas as pd
 import plotly.express as px
 from docx import Document
 from io import BytesIO
-import time
-from datetime import datetime, timedelta
 
 # ==========================================
 # 1. KONFIGURASI HALAMAN & TEMA CEPAT
@@ -82,10 +80,11 @@ def create_docx_file(content, title="Exported_Document"):
     doc.save(bio)
     return bio.getvalue()
 
-# Fungsi pemanggilan AI menggunakan model stabil gemini-1.5-flash
+# Fungsi pemanggilan AI yang diperbarui menggunakan model 'gemini-1.5-flash' secara aman
 def get_fast_ai_response(prompt, api_key):
     try:
         genai.configure(api_key=api_key)
+        # Menggunakan nama model standar yang didukung penuh
         model = genai.GenerativeModel('gemini-1.5-flash')
         response = model.generate_content(prompt)
         return response.text
