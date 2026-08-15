@@ -10,7 +10,6 @@ from io import BytesIO
 # ==========================================
 st.set_page_config(page_title="English learning website", page_icon="🌴", layout="wide")
 
-# CSS Custom: Tema Neon Hijau, Latarmotif Grid Halus, dan Performa Optimal
 custom_css = """
 <style>
     .stApp {
@@ -68,9 +67,6 @@ custom_css = """
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
-# ==========================================
-# 2. FUNGSI OPTIMASI (CACHED & FAST API)
-# ==========================================
 @st.cache_data
 def create_docx_file(content, title="Exported_Document"):
     doc = Document()
@@ -80,19 +76,16 @@ def create_docx_file(content, title="Exported_Document"):
     doc.save(bio)
     return bio.getvalue()
 
-# Fungsi pemanggilan AI menggunakan model 'gemini-2.5-flash' terbaru
+# Menggunakan model gemini-1.5-pro yang sangat stabil
 def get_fast_ai_response(prompt, api_key):
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-2.5-flash')
+        model = genai.GenerativeModel('gemini-1.5-pro')
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
         return f"Error: {str(e)}"
 
-# ==========================================
-# 3. SIDEBAR & NAVIGASI
-# ==========================================
 with st.sidebar:
     st.markdown("### 🌴 English learning website")
     st.caption("Intelligence & Data Platform")
@@ -103,18 +96,12 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("👤 **Trisno Swandy Simanullang**")
 
-# ==========================================
-# HEADER UTAMA
-# ==========================================
 st.title("🌴 Trisno's English learning website")
 st.markdown("Platform Cerdas Pengembang Bahasa Inggris, Riset Perkebunan, & Analisis Pasar.")
 
 if not api_key and menu != "Progress & Target Planner":
     st.warning("⚠️ Masukkan Gemini API Key Anda di sidebar untuk mengaktifkan modul AI.")
 
-# ==========================================
-# MODULE 1: 12-POINT JOURNAL EVALUATOR
-# ==========================================
 if menu == "12-Point Journal Evaluator":
     st.header("📝 12-Point Journal Evaluator")
     journal_input = st.text_area("Input Jurnal / Catatan Riset (ID/EN):", height=180, placeholder="Tuliskan catatan harian atau jurnal Anda di sini...")
@@ -134,21 +121,14 @@ if menu == "12-Point Journal Evaluator":
                 st.success("✅ Evaluasi Selesai!")
                 st.markdown(result)
                 
-                # Tombol Export Word instan
                 docx_data = create_docx_file(result, "Journal_Evaluation")
                 st.download_button("📄 Export ke Word (.docx)", data=docx_data, file_name="Evaluasi_Jurnal.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
-# ==========================================
-# MODULE 2: PROGRESS PLANNER
-# ==========================================
 elif menu == "Progress & Target Planner":
     st.header("📈 Progress & Target Planner")
     st.info("Pantau target harian dan kosakata Anda secara real-time.")
     st.text_area("Target & Fokus Belajar:", "1. Konsistensi Jurnal Harian\n2. Penguasaan Kosakata Perkebunan & Pasar\n3. Analisis Statistik", height=120)
 
-# ==========================================
-# MODULE 3: AI VIDEO PROMPT GEN
-# ==========================================
 elif menu == "AI Video Prompt Gen":
     st.header("🎬 AI Video Prompt Generator (Veo)")
     prompt_input = st.text_area("Deskripsi Visual / Ide Kreatif:", placeholder="Contoh: Perkebunan sawit modern dengan latar belakang teknologi futuristik...", height=120)
@@ -164,9 +144,6 @@ elif menu == "AI Video Prompt Gen":
                 st.success("Prompt Berhasil Dibuat!")
                 st.code(result_prompt, language="markdown")
 
-# ==========================================
-# FOOTER
-# ==========================================
 st.markdown("""
     <div class='footer'>
         Developed with ⚡ by <b>Trisno Swandy Simanullang</b>
