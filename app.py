@@ -65,6 +65,7 @@ if menu == "12-Point Journal Evaluator":
             with st.spinner("Menganalisis teks..."):
                 try:
                     genai.configure(api_key=api_key)
+                    # Menggunakan gemini-1.5-flash agar stabil & tidak error 404
                     model = genai.GenerativeModel('gemini-1.5-flash')
                     response = model.generate_content(f"Bertindaklah sebagai mentor tingkat lanjut. Evaluasi dan perbaiki teks berikut secara komprehensif dalam bahasa Inggris dan Indonesia: {journal_input}")
                     st.success("Evaluasi Selesai!")
