@@ -11,14 +11,8 @@ if st.button("Evaluasi Jurnal 🚀"):
     if not api_key or not journal_text:
         st.warning("Mohon isi API Key dan draf jurnal kamu.")
     else:
-        # Daftar nama model resmi yang didukung Google AI Studio
-        models_to_try = [
-            "gemini-1.5-flash",
-            "gemini-2.0-flash",
-            "gemini-1.5-pro"
-        ]
-        
-        success = False
+        clean_key = api_key.strip()
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={clean_key}"
         headers = {'Content-Type': 'application/json'}
         payload = {
             "contents": [{
@@ -26,20 +20,16 @@ if st.button("Evaluasi Jurnal 🚀"):
             }]
         }
         
-        for model_name in models_to_try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key.strip()}"
-            try:
-                response = requests.post(url, headers=headers, json=payload)
-                res_data = response.json()
-                
-                if response.status_code == 200 and 'candidates' in res_data:
-                    output = res_data['candidates'][0]['content']['parts'][0]['text']
-                    st.success(f"Evaluasi Selesai (Menggunakan model: {model_name})!")
-                    st.write(output)
-                    success = True
-                    break
-            except Exception:
-                continue
-
-        if not success:
-            st.error("Gagal memproses jurnal. Pastikan API Key yang dimasukkan benar dan aktif.")
+        try:
+            response = requests.post(url, headers=headers, json=payload)
+            res_data = response.json()
+            
+            if response.status_code == 200 and 'candidates' in res_data:
+                output = res_data['candidates'][0]['content']['parts'][0]['text']
+                st.success("Evaluasi Selesai!")
+                st.write(output)
+            else:
+                err_msg = res_data.get('error', {}).get('message', 'Terjadi kesalahan pada respon API.')
+                st.error(f"Gagal memproses jurnal: {err_msg}")
+        except Exception as e:
+            st.error(f"Koneksi gagal: {e}")
