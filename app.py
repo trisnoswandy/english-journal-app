@@ -6,7 +6,7 @@ import plotly.express as px
 from docx import Document
 from io import BytesIO
 
-st.set_page_config(page_title="English learning website", page_icon="🌴", layout="wide")
+st.set_page_config(page_title="English Learning Website", page_icon="🌴", layout="wide")
 
 custom_css = """
 <style>
@@ -38,8 +38,14 @@ custom_css = """
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
+# Inisialisasi Session State untuk menyimpan hasil evaluasi & latihan
+if "eval_result" not in st.session_state:
+    st.session_state.eval_result = None
+if "answer_feedback" not in st.session_state:
+    st.session_state.answer_feedback = None
+
 with st.sidebar:
-    st.markdown("### 🌴 English learning website")
+    st.markdown("### 🌴 English Learning Website")
     st.caption("Intelligence & Data Platform")
     st.markdown("---")
     api_key = st.text_input("Gemini API Key", type="password", placeholder="api_key_anda")
@@ -47,17 +53,16 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("👤 **Trisno Swandy Simanullang**")
 
-st.title("🌴 Trisno's English learning website")
+st.title("🌴 Trisno's English Learning Website")
 st.markdown("Platform Cerdas Pengembang Bahasa Inggris, Riset Perkebunan, & Analisis Pasar.")
 
 if not api_key:
     st.warning("⚠️ Masukkan Gemini API Key Anda di sidebar untuk mengaktifkan fitur AI.")
 
-# Menggunakan model Flash multimodal berkecepatan tinggi & stabil
 MODEL_NAME = 'gemini-3.6-flash'
 
 if menu == "12-Point Journal Evaluator":
-    st.header("📝 12-Point Journal Evaluator (Teks & Gambar SS)")
+    st.header("📝 12-Point Journal Evaluator ")
     
     col1, col2 = st.columns([1, 1])
     
@@ -80,7 +85,7 @@ if menu == "12-Point Journal Evaluator":
                     client = genai.Client(api_key=api_key)
                     
                     system_prompt = """
-                    Bertindaklah sebagai Mentor Bahasa Inggris Pribadi. Evaluasi jurnal pengguna (dari teks atau foto screenshot) dan sajikan hasilnya secara mendalam dan presisi sesuai format 12 Poin Evaluasi berikut:
+                    Bertindaklah sebagai Mentor Bahasa Inggris Pribadi. Evaluasi draf jurnal pengguna dan berikan umpan balik yang terstruktur persis mengikuti 12 Poin Evaluasi Jurnal Harian berikut:
 
                     1. **Transkripsi Teks & Versi Alami (Natural)**
                        Menampilkan draf tulisan asli pengguna dan versi perbaikan Bahasa Inggris yang alami (natural English) dalam bentuk paragraf rapi.
@@ -111,13 +116,13 @@ if menu == "12-Point Journal Evaluator":
                        Satu frasa, phrasal verb, atau idiom khas penutur asli beserta contoh penggunaannya dalam kalimat.
 
                     10. **Evaluasi Jurnal Harian**
-                        Umpan balik ringkas, catatan perkembangan, dan apresiasi atas alur cerita jurnal pengguna.
+                        Umpan balik ringkas, catatan perkembangan, dan apresiation atas alur cerita jurnal pengguna.
 
                     11. **Daily Micro-Question (Pertanyaan Tematik Hari Ini)**
                         Satu pertanyaan singkat berbahasa Inggris yang relevan dengan topik jurnal untuk melatih kemampuan merespons cepat.
 
                     12. **Sesi Belajar Singkat (Materi & Latihan Soal)**
-                        Pembahasan materi dasar secara berurutan (6 Poin Fondasi) menggunakan siklus 3 hari pengulangan per materi, diakhiri dengan 3 latihan soal singkat.
+                        Pembahasan materi dasar secara berurutan (6 Poin Fondasi) menggunakan siklus 3 hari pengulangan per materi, diakhiri dengan 3 latihan soal singkat (Soal 1, Soal 2, Soal 3).
                     """
 
                     contents_payload = [system_prompt]
@@ -132,10 +137,59 @@ if menu == "12-Point Journal Evaluator":
                         contents=contents_payload
                     )
                     
-                    st.success("Evaluasi 12 Poin Selesai!")
-                    st.markdown(response.text)
+                    st.session_state.eval_result = response.text
+                    st.session_state.answer_feedback = None  # Reset jawaban lama
                 except Exception as e:
                     st.error(f"Terjadi kesalahan: {str(e)}")
+
+    # Menampilkan hasil evaluasi jika sudah di-generate
+    if st.session_state.eval_result:
+        st.success("Evaluasi 12 Poin Selesai!")
+        st.markdown(st.session_state.eval_result)
+        
+        st.markdown("---")
+        st.subheader("✍️ Lembar Jawaban Latihan Soal & Daily Micro-Question")
+        st.caption("Jawablah pertanyaan dari poin 11 dan 12 di atas untuk diperiksa langsung oleh AI.")
+        
+        user_answers = st.text_area(
+            "Tuliskan jawaban Anda di sini (misal: Jawaban Micro-Question, Jawaban Soal 1, 2, dan 3):",
+            height=150,
+            placeholder="Contoh:\nDaily Micro-Question: I usually study in the evening...\nSoal 1: B\nSoal 2: went\nSoal 3: because"
+        )
+        
+        if st.button("️ Periksa Jawaban Saya"):
+            if not api_key:
+                st.error("API Key belum dimasukkan!")
+            elif not user_answers:
+                st.warning("Silakan tuliskan jawaban Anda terlebih dahulu.")
+            else:
+                with st.spinner("Mengevaluasi jawaban Anda..."):
+                    try:
+                        client = genai.Client(api_key=api_key)
+                        check_prompt = f"""
+                        Berikut adalah konteks soal dan hasil evaluasi sebelumnya:
+                        {st.session_state.eval_result}
+
+                        Berikut adalah jawaban dari pengguna:
+                        "{user_answers}"
+
+                        Tugasmu:
+                        1. Berikan koreksi dan penilaian apakah jawaban pengguna untuk Daily Micro-Question dan 3 Latihan Soal sudah benar.
+                        2. Jika ada yang salah, jelaskan letak kesalahannya dan berikan jawaban yang benar beserta penjelasannya dalam bahasa Indonesia & Inggris.
+                        3. Berikan nilai/skor akhir untuk sesi latihan ini.
+                        """
+                        
+                        feedback_res = client.models.generate_content(
+                            model=MODEL_NAME,
+                            contents=check_prompt
+                        )
+                        st.session_state.answer_feedback = feedback_res.text
+                    except Exception as e:
+                        st.error(f"Terjadi kesalahan: {str(e)}")
+                        
+        if st.session_state.answer_feedback:
+            st.markdown("### 📊 Hasil Penilaian Jawaban Anda")
+            st.info(st.session_state.answer_feedback)
 
 elif menu == "Progress & Target Planner":
     st.header("📈 Progress & Target Planner")
