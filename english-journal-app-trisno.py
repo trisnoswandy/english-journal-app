@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Custom CSS Bersih (Menghapus Semua Kotak Kosong Bawah & Atas)
+# 2. Custom CSS (Pembersihan Kotak Kosong & Desain Tampilan Veo Generator)
 custom_css = """
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
@@ -33,7 +33,7 @@ custom_css = """
         color: #f1f5f9;
     }
 
-    /* Pembasmi Kotak & Container Kosong Streamlit */
+    /* Pembasmi Kontainer Kosong Bawaan Streamlit */
     div[data-testid="stVerticalBlock"] > div:empty,
     div[data-baseweb="notification"],
     .element-container:empty {
@@ -44,7 +44,7 @@ custom_css = """
         margin: 0 !important;
     }
 
-    /* Styling Form & Card Bawaan */
+    /* Styling Form Bawaan Streamlit */
     div[data-testid="stForm"] {
         background: rgba(15, 23, 42, 0.65) !important;
         backdrop-filter: blur(12px) !important;
@@ -140,9 +140,9 @@ custom_css = """
     }
 
     .response-card {
-        background: rgba(15, 23, 42, 0.65);
+        background: rgba(15, 23, 42, 0.75);
         backdrop-filter: blur(12px);
-        border: 1px solid rgba(0, 255, 170, 0.2);
+        border: 1px solid rgba(0, 255, 170, 0.25);
         border-radius: 14px;
         padding: 24px;
         margin: 20px 0;
@@ -168,6 +168,8 @@ if "eval_result" not in st.session_state:
     st.session_state.eval_result = None
 if "answer_feedback" not in st.session_state:
     st.session_state.answer_feedback = None
+if "video_prompt_result" not in st.session_state:
+    st.session_state.video_prompt_result = None
 
 # 4. Sidebar UI
 with st.sidebar:
@@ -261,14 +263,12 @@ if menu == "💬 Smart Assistant & Evaluator":
                 except Exception as e:
                     st.error(f"Terjadi kesalahan: {str(e)}")
 
-    # Tampilan Hasil Respons AI (Hanya Muncul Saat Ada Data)
     if st.session_state.eval_result:
         st.markdown("<div class='response-card'>", unsafe_allow_html=True)
         st.markdown("### 🤖 Respons AI / Hasil Evaluasi")
         st.markdown(st.session_state.eval_result)
         st.markdown("</div>", unsafe_allow_html=True)
         
-        # Form Lembar Jawaban Interaktif
         with st.form(key="answer_form", clear_on_submit=False):
             st.subheader("✍️ Lembar Jawaban Interaktif")
             st.caption("Gunakan bagian ini untuk menjawab latihan soal atau Micro-Question dari hasil evaluasi di atas.")
@@ -295,9 +295,8 @@ if menu == "💬 Smart Assistant & Evaluator":
                         "{user_answers}"
 
                         Tugasmu:
-                        1. Kroscek dan evaluasi apakah jawaban pengguna sudah benar dan tepat.
-                        2. Jika ada kesalahan tata bahasa atau jawaban soal yang keliru, berikan koreksi ramah beserta penjelasannya.
-                        3. Berikan apresiasi dan skor jika sesuai.
+                        1. Kroscek dan evaluasi apakah jawaban pengguna meenuhi kriteria.
+                        2. Berikan penjelasan ringkas beserta koreksi tata bahasa jika ada.
                         """
                         
                         feedback_res = client.models.generate_content(
@@ -323,30 +322,61 @@ elif menu == "📈 Target & Learning Planner":
         height=140
     )
 
-# 8. Fitur 3: AI Video Prompt Gen
+# 8. Fitur 3: AI Video Prompt Generator (Veo Optimized)
 elif menu == "🎬 AI Video Prompt Gen":
-    st.subheader("🎬 AI Video Prompt Generator (Veo)")
+    st.subheader("🎬 AI Video Prompt Generator (Google Veo / Sora)")
+    st.caption("Ubah ide sederhana atau konsep adegan Anda menjadi prompt sinematik profesional yang siap di-copy ke Google Veo, Runway, atau Sora.")
+
     with st.form(key="video_form", clear_on_submit=False):
-        prompt_input = st.text_input("Deskripsi Visual / Ide Kreatif (Tekan Enter untuk Kirim):", placeholder="Misal: Cinematic drone shot of oil palm plantation...")
-        prompt_submitted = st.form_submit_button("✨ Generate Prompt")
-    
+        prompt_input = st.text_input(
+            "Deskripsi Visual / Ide Kreatif (Tekan Enter untuk Kirim):",
+            placeholder="Misal: Drone memperlihatkan kebun kelapa sawit saat matahari terbit..."
+        )
+        prompt_submitted = st.form_submit_button("✨ Generate Cinematic Video Prompt")
+
     if prompt_submitted:
         if not api_key:
-            st.error("⚠️ Masukkan API Key di sidebar!")
+            st.error("⚠️ Silakan masukkan Gemini API Key di sidebar terlebih dahulu!")
         elif not prompt_input:
-            st.warning("⚠️ Masukkan deskripsi visual terlebih dahulu.")
+            st.warning("⚠️ Masukkan ide visual atau deskripsi adegan terlebih dahulu.")
         else:
-            with st.spinner("⚡ Menyusun prompt sinematik..."):
+            with st.spinner("⚡ Menyusun prompt sinematik untuk Google Veo..."):
                 try:
                     client = genai.Client(api_key=api_key)
+                    
+                    veo_system_prompt = """
+                    Kamu adalah seorang Prompt Engineer & Director of Photography (DoP) spesialis AI Generator Video seperti Google Veo, OpenAI Sora, dan Runway Gen-3.
+
+                    [TUGAS UTAMA]:
+                    Ubah input atau pertanyaan pengguna langsung menjadi Prompt Video AI Sinematik yang sangat detail dalam Bahasa Inggris (standar industri AI Video). 
+                    Jangan memberikan penjelasan teori/definisi tentang apa itu Veo kecuali diminta secara khusus!
+
+                    [FORMAT OUTPUT YANG WAJIB DIGUNAKAN]:
+                    1. **English Prompt (Ready-to-Copy for Veo/Sora)**:
+                       Prompt lengkap dalam 1 paragraf bahasa Inggris yang mencakup: Subject, Action, Environment, Camera Movement (contoh: Panning, Drone FP, Orbit), Lighting (contoh: Golden Hour, Cinematic Neon), Style (contoh: Photorealistic, 8k resolution, IMAX 35mm lens, 60fps).
+                    
+                    2. **Breakdown Elemen Sinematik**:
+                       - 🎥 **Camera Angle/Movement**: ...
+                       - 💡 **Lighting & Color Palette**: ...
+                       - 🎞️ **Visual Style & Lens**: ...
+                       - 🔊 **Suggested Audio/Atmosphere**: ...
+
+                    Jawab langsung sesuai format tanpa intro bertele-tele.
+                    """
+                    
                     response = client.models.generate_content(
                         model=MODEL_NAME,
-                        contents=f"Ubah ide ini menjadi prompt video AI sinematik berkualitas tinggi: {prompt_input}"
+                        contents=f"{veo_system_prompt}\n\nInput Ide Pengguna: {prompt_input}"
                     )
-                    st.success("Prompt Berhasil Dibuat!")
-                    st.code(response.text, language="markdown")
+                    st.session_state.video_prompt_result = response.text
                 except Exception as e:
                     st.error(f"Terjadi kesalahan: {str(e)}")
+
+    if st.session_state.video_prompt_result:
+        st.markdown("<div class='response-card'>", unsafe_allow_html=True)
+        st.markdown("### 🎬 Prompt Video Sinematik Siap Pakai")
+        st.markdown(st.session_state.video_prompt_result)
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # 9. Footer
 st.markdown("<div class='footer'>Developed with ⚡ by <b>Trisno Swandy Simanullang</b> | Powered by Gemini 3.6 Flash</div>", unsafe_allow_html=True)
