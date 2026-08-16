@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Custom CSS (Rapi, Proper, Tanpa Element Glitch/Empty Box)
+# 2. Custom CSS (Menghapus Semua Spasi & Kotak Kosong Bawaan Streamlit)
 custom_css = """
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
@@ -33,23 +33,46 @@ custom_css = """
         color: #f1f5f9;
     }
 
-    /* Hilangkan kontainer alert bawaan yang sering menyisakan kotak kosong */
-    div[data-baseweb="notification"] {
-        background-color: rgba(15, 23, 42, 0.8) !important;
-        border: 1px solid rgba(0, 255, 170, 0.3) !important;
-        border-radius: 10px !important;
-        color: #00ffaa !important;
+    /* Paksa hapus background & border pada kontainer kosong bawaan Streamlit */
+    div[data-testid="stVerticalBlock"] > div:empty,
+    div[data-baseweb="notification"],
+    .element-container:empty {
+        display: none !important;
+        background: transparent !important;
+        border: none !important;
     }
 
-    /* Container Card Glassmorphism */
+    /* Header Container Bersatu (Tanpa Elemen Terpisah) */
+    .header-box {
+        margin-bottom: 24px;
+        padding-bottom: 8px;
+    }
+
+    .brand-title {
+        font-size: 2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #00ffaa 0%, #00b8d4 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0 0 6px 0 !important;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .brand-subtitle {
+        color: #94a3b8;
+        font-size: 0.95rem;
+        margin: 0 !important;
+    }
+
+    /* Card Layout Rapi & Modern */
     .pro-card {
         background: rgba(15, 23, 42, 0.65);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         border: 1px solid rgba(0, 255, 170, 0.2);
         border-radius: 14px;
-        padding: 20px 24px;
-        margin-bottom: 16px;
+        padding: 24px;
+        margin-bottom: 20px;
         box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     }
 
@@ -59,27 +82,9 @@ custom_css = """
         border-right: 1px solid rgba(0, 255, 170, 0.15);
     }
 
-    /* Text & Headings */
     h1, h2, h3 {
         color: #00ffaa !important;
         font-family: 'JetBrains Mono', monospace !important;
-        letter-spacing: -0.5px;
-        margin-top: 0px !important;
-    }
-
-    .brand-title {
-        font-size: 1.8rem;
-        font-weight: 700;
-        background: linear-gradient(135deg, #00ffaa 0%, #00b8d4 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 2px;
-    }
-
-    .brand-subtitle {
-        color: #94a3b8;
-        font-size: 0.95rem;
-        margin-bottom: 12px;
     }
 
     /* Custom Buttons */
@@ -101,7 +106,7 @@ custom_css = """
         transform: translateY(-2px);
     }
 
-    /* Input Fields Styling */
+    /* Form Input */
     .stTextArea textarea, .stTextInput input {
         background-color: rgba(15, 23, 42, 0.8) !important;
         border: 1px solid #1e293b !important;
@@ -114,17 +119,15 @@ custom_css = """
         box-shadow: 0 0 8px rgba(0, 255, 170, 0.3) !important;
     }
 
-    /* Custom Badge Warning */
     .api-warn-badge {
-        padding: 8px 14px;
+        padding: 10px 16px;
         border-radius: 8px;
         font-size: 0.85rem;
         font-weight: 600;
-        background: rgba(239, 68, 68, 0.1);
+        background: rgba(239, 68, 68, 0.12);
         color: #f87171;
         border: 1px solid rgba(239, 68, 68, 0.3);
-        margin-bottom: 16px;
-        display: inline-block;
+        margin-bottom: 20px;
     }
 
     .status-badge {
@@ -139,7 +142,6 @@ custom_css = """
         margin-bottom: 12px;
     }
 
-    /* Footer */
     .footer {
         position: relative;
         margin-top: 40px;
@@ -163,7 +165,7 @@ if "answer_feedback" not in st.session_state:
 
 # 4. Sidebar UI
 with st.sidebar:
-    st.markdown("<div class='brand-title'>🌴 Trisno's Hub</div>", unsafe_allow_html=True)
+    st.markdown("<div class='brand-title' style='font-size:1.5rem;'>🌴 Trisno's Hub</div>", unsafe_allow_html=True)
     st.markdown("<div class='brand-subtitle'>Intelligence & Data Platform</div>", unsafe_allow_html=True)
     st.markdown("---")
     
@@ -181,11 +183,15 @@ with st.sidebar:
     st.markdown("👤 **Trisno Swandy Simanullang**")
     st.markdown("<span class='status-badge'>PRO PLATFORM ACTIVE</span>", unsafe_allow_html=True)
 
-# 5. Header Utama (Sesuai Tata Letak Tanpa Kotak Kosong)
-st.markdown("<div class='brand-title'>🌴 Trisno's Intelligence Workspace</div>", unsafe_allow_html=True)
-st.markdown("<div class='brand-subtitle'>Platform Cerdas Pengembang Bahasa Inggris, Analisis Pasar, & Riset Perkebunan.</div>", unsafe_allow_html=True)
+# 5. Header Utama (Dibuat Bersatu 1 Blok HTML untuk Membasmi Kotak Kosong)
+st.markdown("""
+<div class='header-box'>
+    <div class='brand-title'>🌴 Trisno's Intelligence Workspace</div>
+    <div class='brand-subtitle'>Platform Cerdas Pengembang Bahasa Inggris, Analisis Pasar, & Riset Perkebunan.</div>
+</div>
+""", unsafe_allow_html=True)
 
-# Notifikasi API key berbentuk badge ramping jika belum diisi (tanpa kotak kosong)
+# Peringatan API key hanya muncul dalam badge tipis tanpa kotak latar belakang Streamlit
 if not api_key:
     st.markdown("<div class='api-warn-badge'>⚠️ Masukkan Gemini API Key di sidebar sebelah kiri untuk mengaktifkan fitur AI.</div>", unsafe_allow_html=True)
 
@@ -308,7 +314,7 @@ if menu == "💬 Smart Assistant & Evaluator":
         if st.session_state.answer_feedback:
             st.markdown("---")
             st.markdown("### 📊 Hasil Penilaian & FeedBack")
-            st.info(st.session_state.answer_feedback)
+            st.write(st.session_state.answer_feedback)
         st.markdown("</div>", unsafe_allow_html=True)
 
 # 7. Fitur 2: Target Planner
