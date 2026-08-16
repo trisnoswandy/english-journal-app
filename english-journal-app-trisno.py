@@ -1,10 +1,6 @@
 import streamlit as st
 from google import genai
 from PIL import Image
-import pandas as pd
-import plotly.express as px
-from docx import Document
-from io import BytesIO
 
 # 1. Konfigurasi Halaman
 st.set_page_config(
@@ -14,7 +10,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Custom CSS (Pembersihan Kotak Kosong & Desain Tampilan Veo Generator)
+# 2. Custom CSS (Pembersihan Total Glitch & UI Dark Theme Sinematik)
 custom_css = """
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
@@ -200,6 +196,14 @@ if not api_key:
 
 MODEL_NAME = 'gemini-3.6-flash'
 
+# Helper Function Penanganan Error API Kuota (429 Rate Limit)
+def handle_api_error(e):
+    err_msg = str(e)
+    if "429" in err_msg or "RESOURCE_EXHAUSTED" in err_msg:
+        st.warning("⏳ **Kuota API Terlampaui (Rate Limit 429):** Mohon tunggu sekitar 30 detik atau gunakan API Key baru dari Google AI Studio.")
+    else:
+        st.error(f"Terjadi kesalahan: {err_msg}")
+
 # 6. Fitur 1: Smart Assistant & Evaluator
 if menu == "💬 Smart Assistant & Evaluator":
     st.subheader("💬 Smart Assistant & 12-Point Journal Evaluator")
@@ -210,7 +214,7 @@ if menu == "💬 Smart Assistant & Evaluator":
         with col1:
             user_input = st.text_input(
                 "📝 Pesan / Pertanyaan (Tekan Enter untuk Kirim):",
-                placeholder="Misal: Apa kejadian penting kemarin? / Analisis saham BBCA... (tekan Enter)"
+                placeholder="Misal: Apa kejadian penting kemarin? / Analisis saham BBCA..."
             )
         with col2:
             uploaded_image = st.file_uploader("📷 Upload Foto / Screenshot (Opsional):", type=["png", "jpg", "jpeg"])
@@ -237,7 +241,7 @@ if menu == "💬 Smart Assistant & Evaluator":
                     [INSTRUKSI UTAMA]:
                     1. DILARANG BERTANYA BALIK ATAU MEMBERIKAN OPSI PILIHAN.
                     2. JAWAB LANGSUNG, CEPAT, RINGKAS, DAN AKURAT saat menerima pertanyaan. 
-                    3. Jika pengguna bertanya hal umum (seperti "apa yang terjadi kemarin?"), LANGSUNG berikan rangkuman poin-poin peristiwa penting utama (Berita Nasional/Global & Pasar Finansial) tanpa meminta konfirmasi.
+                    3. Jika pengguna bertanya hal umum, LANGSUNG berikan rangkuman poin-poin peristiwa penting utama tanpa meminta konfirmasi.
                     4. Lakukan kroscek data dan logika secara mandiri sebelum memberikan jawaban akhir.
                     5. Gunakan poin-poin terstruktur agar mudah dibaca di HP maupun PC.
 
@@ -261,7 +265,7 @@ if menu == "💬 Smart Assistant & Evaluator":
                     st.session_state.eval_result = response.text
                     st.session_state.answer_feedback = None
                 except Exception as e:
-                    st.error(f"Terjadi kesalahan: {str(e)}")
+                    handle_api_error(e)
 
     if st.session_state.eval_result:
         st.markdown("<div class='response-card'>", unsafe_allow_html=True)
@@ -274,7 +278,7 @@ if menu == "💬 Smart Assistant & Evaluator":
             st.caption("Gunakan bagian ini untuk menjawab latihan soal atau Micro-Question dari hasil evaluasi di atas.")
             user_answers = st.text_input(
                 "Tuliskan jawaban Anda di sini (Tekan Enter untuk Kirim):",
-                placeholder="Misal: Jawaban soal 1: A... (lalu tekan Enter)"
+                placeholder="Misal: Jawaban soal 1: A..."
             )
             answer_submitted = st.form_submit_button("✔️ Periksa Jawaban Saya")
         
@@ -295,7 +299,7 @@ if menu == "💬 Smart Assistant & Evaluator":
                         "{user_answers}"
 
                         Tugasmu:
-                        1. Kroscek dan evaluasi apakah jawaban pengguna meenuhi kriteria.
+                        1. Kroscek dan evaluasi apakah jawaban pengguna memenuhi kriteria.
                         2. Berikan penjelasan ringkas beserta koreksi tata bahasa jika ada.
                         """
                         
@@ -305,7 +309,7 @@ if menu == "💬 Smart Assistant & Evaluator":
                         )
                         st.session_state.answer_feedback = feedback_res.text
                     except Exception as e:
-                        st.error(f"Terjadi kesalahan: {str(e)}")
+                        handle_api_error(e)
                         
         if st.session_state.answer_feedback:
             st.markdown("<div class='response-card'>", unsafe_allow_html=True)
@@ -348,12 +352,12 @@ elif menu == "🎬 AI Video Prompt Gen":
                     Kamu adalah seorang Prompt Engineer & Director of Photography (DoP) spesialis AI Generator Video seperti Google Veo, OpenAI Sora, dan Runway Gen-3.
 
                     [TUGAS UTAMA]:
-                    Ubah input atau pertanyaan pengguna langsung menjadi Prompt Video AI Sinematik yang sangat detail dalam Bahasa Inggris (standar industri AI Video). 
-                    Jangan memberikan penjelasan teori/definisi tentang apa itu Veo kecuali diminta secara khusus!
+                    Ubah input pengguna secara langsung menjadi Prompt Video AI Sinematik yang sangat detail dalam Bahasa Inggris (standar industri AI Video). 
+                    DILARANG memberikan penjelasan teoritis atau definisi tentang apa itu Veo!
 
                     [FORMAT OUTPUT YANG WAJIB DIGUNAKAN]:
                     1. **English Prompt (Ready-to-Copy for Veo/Sora)**:
-                       Prompt lengkap dalam 1 paragraf bahasa Inggris yang mencakup: Subject, Action, Environment, Camera Movement (contoh: Panning, Drone FP, Orbit), Lighting (contoh: Golden Hour, Cinematic Neon), Style (contoh: Photorealistic, 8k resolution, IMAX 35mm lens, 60fps).
+                       Prompt lengkap dalam 1 paragraf bahasa Inggris yang mencakup: Subject, Action, Environment, Camera Movement (seperti Panning, Drone FPV, Orbit), Lighting (seperti Golden Hour, Cinematic Neon), dan Style (seperti Photorealistic, 8k resolution, IMAX 35mm lens, 60fps).
                     
                     2. **Breakdown Elemen Sinematik**:
                        - 🎥 **Camera Angle/Movement**: ...
@@ -361,7 +365,7 @@ elif menu == "🎬 AI Video Prompt Gen":
                        - 🎞️ **Visual Style & Lens**: ...
                        - 🔊 **Suggested Audio/Atmosphere**: ...
 
-                    Jawab langsung sesuai format tanpa intro bertele-tele.
+                    Jawab langsung sesuai format di atas tanpa intro bertele-tele.
                     """
                     
                     response = client.models.generate_content(
@@ -370,7 +374,7 @@ elif menu == "🎬 AI Video Prompt Gen":
                     )
                     st.session_state.video_prompt_result = response.text
                 except Exception as e:
-                    st.error(f"Terjadi kesalahan: {str(e)}")
+                    handle_api_error(e)
 
     if st.session_state.video_prompt_result:
         st.markdown("<div class='response-card'>", unsafe_allow_html=True)
