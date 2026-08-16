@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Custom CSS & Styling (Tema Cyber-Neon Pro)
+# 2. Custom CSS (Rapi, Proper, Tanpa Element Glitch/Empty Box)
 custom_css = """
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
@@ -33,15 +33,23 @@ custom_css = """
         color: #f1f5f9;
     }
 
-    /* Container Card bergaya Glassmorphism */
+    /* Hilangkan kontainer alert bawaan yang sering menyisakan kotak kosong */
+    div[data-baseweb="notification"] {
+        background-color: rgba(15, 23, 42, 0.8) !important;
+        border: 1px solid rgba(0, 255, 170, 0.3) !important;
+        border-radius: 10px !important;
+        color: #00ffaa !important;
+    }
+
+    /* Container Card Glassmorphism */
     .pro-card {
         background: rgba(15, 23, 42, 0.65);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         border: 1px solid rgba(0, 255, 170, 0.2);
         border-radius: 14px;
-        padding: 24px;
-        margin-bottom: 20px;
+        padding: 20px 24px;
+        margin-bottom: 16px;
         box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     }
 
@@ -56,6 +64,7 @@ custom_css = """
         color: #00ffaa !important;
         font-family: 'JetBrains Mono', monospace !important;
         letter-spacing: -0.5px;
+        margin-top: 0px !important;
     }
 
     .brand-title {
@@ -64,13 +73,13 @@ custom_css = """
         background: linear-gradient(135deg, #00ffaa 0%, #00b8d4 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin-bottom: 4px;
+        margin-bottom: 2px;
     }
 
     .brand-subtitle {
         color: #94a3b8;
-        font-size: 0.9rem;
-        margin-bottom: 20px;
+        font-size: 0.95rem;
+        margin-bottom: 12px;
     }
 
     /* Custom Buttons */
@@ -105,17 +114,19 @@ custom_css = """
         box-shadow: 0 0 8px rgba(0, 255, 170, 0.3) !important;
     }
 
-    /* Footer */
-    .footer {
-        position: fixed; left: 0; bottom: 0; width: 100%;
-        background-color: rgba(3, 7, 18, 0.95);
-        color: #64748b; text-align: center;
-        padding: 12px; font-size: 12px;
-        border-top: 1px solid rgba(0, 255, 170, 0.15);
-        z-index: 100; backdrop-filter: blur(8px);
+    /* Custom Badge Warning */
+    .api-warn-badge {
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        background: rgba(239, 68, 68, 0.1);
+        color: #f87171;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        margin-bottom: 16px;
+        display: inline-block;
     }
 
-    /* Custom Badge */
     .status-badge {
         display: inline-block;
         padding: 4px 12px;
@@ -126,6 +137,19 @@ custom_css = """
         color: #00ffaa;
         border: 1px solid rgba(0, 255, 170, 0.3);
         margin-bottom: 12px;
+    }
+
+    /* Footer */
+    .footer {
+        position: relative;
+        margin-top: 40px;
+        width: 100%;
+        background-color: rgba(3, 7, 18, 0.95);
+        color: #64748b; 
+        text-align: center;
+        padding: 16px; 
+        font-size: 12px;
+        border-top: 1px solid rgba(0, 255, 170, 0.15);
     }
 </style>
 """
@@ -157,24 +181,21 @@ with st.sidebar:
     st.markdown("👤 **Trisno Swandy Simanullang**")
     st.markdown("<span class='status-badge'>PRO PLATFORM ACTIVE</span>", unsafe_allow_html=True)
 
-# 5. Header Utama (Perbaikan: Tidak ada elemen st.info kosong lagi di bawah judul)
+# 5. Header Utama (Sesuai Tata Letak Tanpa Kotak Kosong)
 st.markdown("<div class='brand-title'>🌴 Trisno's Intelligence Workspace</div>", unsafe_allow_html=True)
-st.markdown("Platform Cerdas Pengembang Bahasa Inggris, Analisis Pasar, & Riset Perkebunan.")
+st.markdown("<div class='brand-subtitle'>Platform Cerdas Pengembang Bahasa Inggris, Analisis Pasar, & Riset Perkebunan.</div>", unsafe_allow_html=True)
 
-# Peringatan hanya muncul jika API Key belum diisi
+# Notifikasi API key berbentuk badge ramping jika belum diisi (tanpa kotak kosong)
 if not api_key:
-    st.warning("⚠️ Masukkan Gemini API Key Anda di sidebar sebelah kiri untuk mulai menggunakan fitur AI.")
+    st.markdown("<div class='api-warn-badge'>⚠️ Masukkan Gemini API Key di sidebar sebelah kiri untuk mengaktifkan fitur AI.</div>", unsafe_allow_html=True)
 
-st.markdown("<br>", unsafe_allow_html=True)
-
-# Menggunakan model gemini-3.6-flash
 MODEL_NAME = 'gemini-3.6-flash'
 
 # 6. Fitur 1: Smart Assistant & Evaluator
 if menu == "💬 Smart Assistant & Evaluator":
     st.markdown("<div class='pro-card'>", unsafe_allow_html=True)
     st.subheader("💬 Smart Assistant & 12-Point Journal Evaluator")
-    st.write("Ketik pertanyaan (saham, berita, riset) lalu tekan Enter untuk respon langsung tanpa tombol kirim.")
+    st.write("Ketik pertanyaan (saham, berita, riset) lalu tekan Enter untuk respon langsung.")
     
     col1, col2 = st.columns([1, 1])
     
@@ -206,9 +227,9 @@ if menu == "💬 Smart Assistant & Evaluator":
                     Kamu adalah asisten AI pribadi bernama Gemini. 
 
                     [INSTRUKSI UTAMA]:
-                    1. JANGANKAN BERTANYA BALIK ATAU MEMBERIKAN OPSI PILIHAN (seperti "Apakah kamu ingin tahu tentang A/B/C?").
+                    1. DILARANG BERTANYA BALIK ATAU MEMBERIKAN OPSI PILIHAN.
                     2. JAWAB LANGSUNG, CEPAT, RINGKAS, DAN AKURAT saat menerima pertanyaan. 
-                    3. JIKA pengguna bertanya hal umum seperti "apa yang terjadi kemarin?", LANGSUNG berikan rangkuman poin-poin peristiwa penting utama (Berita Nasional/Global & Pasar Finansial) tanpa basa-basi.
+                    3. Jika pengguna bertanya hal umum (seperti "apa yang terjadi kemarin?"), LANGSUNG berikan rangkuman poin-poin peristiwa penting utama (Berita Nasional/Global & Pasar Finansial) tanpa meminta konfirmasi.
                     4. Lakukan kroscek data dan logika secara mandiri sebelum memberikan jawaban akhir.
                     5. Gunakan poin-poin terstruktur agar mudah dibaca di HP maupun PC.
 
