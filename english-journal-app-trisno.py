@@ -157,29 +157,32 @@ with st.sidebar:
     st.markdown("👤 **Trisno Swandy Simanullang**")
     st.markdown("<span class='status-badge'>PRO PLATFORM ACTIVE</span>", unsafe_allow_html=True)
 
-# 5. Header Utama
+# 5. Header Utama (Perbaikan: Tidak ada elemen st.info kosong lagi di bawah judul)
 st.markdown("<div class='brand-title'>🌴 Trisno's Intelligence Workspace</div>", unsafe_allow_html=True)
 st.markdown("Platform Cerdas Pengembang Bahasa Inggris, Analisis Pasar, & Riset Perkebunan.")
 
+# Peringatan hanya muncul jika API Key belum diisi
 if not api_key:
-    st.info("💡 **Petunjuk:** Masukkan Gemini API Key Anda di sidebar sebelah kiri untuk mulai menggunakan fitur AI.")
+    st.warning("⚠️ Masukkan Gemini API Key Anda di sidebar sebelah kiri untuk mulai menggunakan fitur AI.")
 
-# Menggunakan model gemini-3.6-flash sesuai permintaan
+st.markdown("<br>", unsafe_allow_html=True)
+
+# Menggunakan model gemini-3.6-flash
 MODEL_NAME = 'gemini-3.6-flash'
 
 # 6. Fitur 1: Smart Assistant & Evaluator
 if menu == "💬 Smart Assistant & Evaluator":
     st.markdown("<div class='pro-card'>", unsafe_allow_html=True)
     st.subheader("💬 Smart Assistant & 12-Point Journal Evaluator")
-    st.write("Ketik pertanyaan bebas (saham, riset, diskusi) untuk obrolan biasa, atau masukkan draf jurnal/foto SS untuk evaluasi 12 Poin Bahasa Inggris.")
+    st.write("Ketik pertanyaan (saham, berita, riset) lalu tekan Enter untuk respon langsung tanpa tombol kirim.")
     
     col1, col2 = st.columns([1, 1])
     
     with col1:
         with st.form(key="chat_form", clear_on_submit=False):
             user_input = st.text_input(
-                "📝 Pesan / Jurnal / Pertanyaan (Tekan Enter untuk Kirim):",
-                placeholder="Misal: Analisis pergerakan pasar atau berita hari ini... (tekan Enter)"
+                "📝 Pesan / Pertanyaan (Tekan Enter untuk Kirim):",
+                placeholder="Misal: Apa kejadian penting kemarin? / Analisis saham BBCA... (tekan Enter)"
             )
             submitted = st.form_submit_button("🚀 Kirim / Analisis Data")
             
@@ -200,30 +203,18 @@ if menu == "💬 Smart Assistant & Evaluator":
                     client = genai.Client(api_key=api_key)
                     
                     system_prompt = """
-                    Kamu adalah asisten AI pribadi yang cerdas, akurat, dan komunikatif bernama Gemini. 
+                    Kamu adalah asisten AI pribadi bernama Gemini. 
 
-                    [ATURAN UTAMA]:
-                    - Sebelum memberikan jawaban akhir, lakukan kroscek (pemeriksaan ulang) secara cermat terhadap kebenaran data, logika, dan kelengkapan informasi agar tidak ada kesalahan.
-                    - Jawablah secara akurat, lugas, dan sesuai niat pengguna.
+                    [INSTRUKSI UTAMA]:
+                    1. JANGANKAN BERTANYA BALIK ATAU MEMBERIKAN OPSI PILIHAN (seperti "Apakah kamu ingin tahu tentang A/B/C?").
+                    2. JAWAB LANGSUNG, CEPAT, RINGKAS, DAN AKURAT saat menerima pertanyaan. 
+                    3. JIKA pengguna bertanya hal umum seperti "apa yang terjadi kemarin?", LANGSUNG berikan rangkuman poin-poin peristiwa penting utama (Berita Nasional/Global & Pasar Finansial) tanpa basa-basi.
+                    4. Lakukan kroscek data dan logika secara mandiri sebelum memberikan jawaban akhir.
+                    5. Gunakan poin-poin terstruktur agar mudah dibaca di HP maupun PC.
 
-                    [INSTRUKSI LOGIKA RESPON]:
-                    1. JIKA pengguna mengirimkan draf jurnal harian, tulisan latihan bahasa Inggris, atau secara eksplisit meminta evaluasi jurnal:
-                       --> Berikan evaluasi lengkap dan mendalam yang terstruktur persis dalam 12 POIN EVALUASI JURNAL HARIAN berikut:
-                          1. Transkripsi Teks & Versi Alami (Natural)
-                          2. Kamus Kata-Kata (Siap Salin ke Notion, tanpa tabel)
-                          3. Bedah Struktur & Pilihan Kata (Word-by-Word Analysis + Fonetik)
-                          4. Before vs After Transformation
-                          5. Top 3 Vocabulary Focus
-                          6. Mastered Verb Tracker (V1, V2, V3)
-                          7. Skor & Persentase Ketepatan Mandiri (Formula: Skor = (Kata Benar / Total Kata) * 100%)
-                          8. Pronunciation Challenge
-                          9. Native Phrase of the Day
-                          10. Evaluasi Jurnal Harian
-                          11. Daily Micro-Question
-                          12. Sesi Belajar Singkat (Materi 6 Poin Fondasi & 3 Latihan Soal)
-
-                    2. JIKA pengguna menanyakan pertanyaan umum, berita pasar/saham, riset perkebunan/pertanian, analisis data, atau mengobrol biasa:
-                       --> Jawablah secara langsung, informatif, lugas, dan komunikatif seperti dalam obrolan biasa. JANGAN paksa menggunakan format 12 poin evaluasi jika pengguna hanya bertanya atau mengobrol umum.
+                    [INSTRUKSI KONTEN]:
+                    - JIKA pertanyaan berisi obrolan biasa / berita / pasar saham / riset pertanian: Jawab secara langsung dalam bentuk rangkuman poin-poin berita atau analisis teknis tanpa bertanya kembali.
+                    - JIKA draf berupa tulisan latihan bahasa Inggris atau evaluasi jurnal harian: Berikan evaluasi lengkap 12 POIN EVALUASI JURNAL HARIAN.
                     """
 
                     contents_payload = [system_prompt]
