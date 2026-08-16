@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Custom CSS (Menghapus Semua Spasi & Kotak Kosong Bawaan Streamlit)
+# 2. Custom CSS (Membersihkan Seluruh Glitch & Kotak Kosong Bawaan Streamlit)
 custom_css = """
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
@@ -33,38 +33,18 @@ custom_css = """
         color: #f1f5f9;
     }
 
-    /* Paksa hapus background & border pada kontainer kosong bawaan Streamlit */
-    div[data-testid="stVerticalBlock"] > div:empty,
+    /* Hilangkan total kontainer kosong bawaan Streamlit */
+    [data-testid="stVerticalBlock"] > div:empty,
     div[data-baseweb="notification"],
     .element-container:empty {
         display: none !important;
         background: transparent !important;
         border: none !important;
-    }
-
-    /* Header Container Bersatu (Tanpa Elemen Terpisah) */
-    .header-box {
-        margin-bottom: 24px;
-        padding-bottom: 8px;
-    }
-
-    .brand-title {
-        font-size: 2rem;
-        font-weight: 700;
-        background: linear-gradient(135deg, #00ffaa 0%, #00b8d4 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin: 0 0 6px 0 !important;
-        font-family: 'JetBrains Mono', monospace;
-    }
-
-    .brand-subtitle {
-        color: #94a3b8;
-        font-size: 0.95rem;
+        padding: 0 !important;
         margin: 0 !important;
     }
 
-    /* Card Layout Rapi & Modern */
+    /* Card Styling */
     .pro-card {
         background: rgba(15, 23, 42, 0.65);
         backdrop-filter: blur(12px);
@@ -85,6 +65,23 @@ custom_css = """
     h1, h2, h3 {
         color: #00ffaa !important;
         font-family: 'JetBrains Mono', monospace !important;
+    }
+
+    /* Text Header */
+    .brand-title {
+        font-size: 2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #00ffaa 0%, #00b8d4 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0 0 4px 0 !important;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .brand-subtitle {
+        color: #94a3b8;
+        font-size: 0.95rem;
+        margin: 0 0 20px 0 !important;
     }
 
     /* Custom Buttons */
@@ -183,15 +180,10 @@ with st.sidebar:
     st.markdown("👤 **Trisno Swandy Simanullang**")
     st.markdown("<span class='status-badge'>PRO PLATFORM ACTIVE</span>", unsafe_allow_html=True)
 
-# 5. Header Utama (Dibuat Bersatu 1 Blok HTML untuk Membasmi Kotak Kosong)
-st.markdown("""
-<div class='header-box'>
-    <div class='brand-title'>🌴 Trisno's Intelligence Workspace</div>
-    <div class='brand-subtitle'>Platform Cerdas Pengembang Bahasa Inggris, Analisis Pasar, & Riset Perkebunan.</div>
-</div>
-""", unsafe_allow_html=True)
+# 5. Header Utama (Satu Komponen Rapi Tanpa Kotak Kosong)
+st.markdown("<div class='brand-title'>🌴 Trisno's Intelligence Workspace</div>", unsafe_allow_html=True)
+st.markdown("<div class='brand-subtitle'>Platform Cerdas Pengembang Bahasa Inggris, Analisis Pasar, & Riset Perkebunan.</div>", unsafe_allow_html=True)
 
-# Peringatan API key hanya muncul dalam badge tipis tanpa kotak latar belakang Streamlit
 if not api_key:
     st.markdown("<div class='api-warn-badge'>⚠️ Masukkan Gemini API Key di sidebar sebelah kiri untuk mengaktifkan fitur AI.</div>", unsafe_allow_html=True)
 
@@ -199,9 +191,8 @@ MODEL_NAME = 'gemini-3.6-flash'
 
 # 6. Fitur 1: Smart Assistant & Evaluator
 if menu == "💬 Smart Assistant & Evaluator":
-    st.markdown("<div class='pro-card'>", unsafe_allow_html=True)
     st.subheader("💬 Smart Assistant & 12-Point Journal Evaluator")
-    st.write("Ketik pertanyaan (saham, berita, riset) lalu tekan Enter untuk respon langsung.")
+    st.caption("Ketik pertanyaan (saham, berita, riset) lalu tekan Enter untuk respon langsung.")
     
     col1, col2 = st.columns([1, 1])
     
@@ -233,7 +224,7 @@ if menu == "💬 Smart Assistant & Evaluator":
                     Kamu adalah asisten AI pribadi bernama Gemini. 
 
                     [INSTRUKSI UTAMA]:
-                    1. DILARANG BERTANYA BALIK ATAU MEMBERIKAN OPSI PILIHAN.
+                    1. DILARANG BERTANYA BALIK ATAU MEMBERIKAN OPSI PILIHAN (seperti "Apakah Anda ingin berita A/B/C?").
                     2. JAWAB LANGSUNG, CEPAT, RINGKAS, DAN AKURAT saat menerima pertanyaan. 
                     3. Jika pengguna bertanya hal umum (seperti "apa yang terjadi kemarin?"), LANGSUNG berikan rangkuman poin-poin peristiwa penting utama (Berita Nasional/Global & Pasar Finansial) tanpa meminta konfirmasi.
                     4. Lakukan kroscek data dan logika secara mandiri sebelum memberikan jawaban akhir.
@@ -260,7 +251,6 @@ if menu == "💬 Smart Assistant & Evaluator":
                     st.session_state.answer_feedback = None
                 except Exception as e:
                     st.error(f"Terjadi kesalahan: {str(e)}")
-    st.markdown("</div>", unsafe_allow_html=True)
 
     # Tampilan Hasil Respons AI
     if st.session_state.eval_result:
