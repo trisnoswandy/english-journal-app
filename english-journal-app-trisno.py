@@ -383,4 +383,4 @@ elif menu == "🎬 AI Video Prompt Gen":
         st.markdown("</div>", unsafe_allow_html=True)
 
 # 9. Footer
-st.markdown("<div class='footer'>Developed with ⚡ by <b>Trisno Swandy Simanullang</b> | Powered by Gemini 3.6 Flash</div>", unsafe_allow_html=True)
+st.markdown("<div class='footer'>Developed with 🌴 by <b>Trisno Swandy Simanullang</b> | Powered by Gemini 3.6 Flash</div>", unsafe_allow_html=True)
