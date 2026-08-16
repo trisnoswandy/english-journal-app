@@ -59,7 +59,7 @@ st.markdown("Platform Cerdas Pengembang Bahasa Inggris, Analisis Pasar, & Riset 
 if not api_key:
     st.warning("⚠️ Masukkan Gemini API Key Anda di sidebar untuk mengaktifkan fitur AI.")
 
-MODEL_NAME = 'gemini-2.5-flash'
+MODEL_NAME = 'gemini-3.6-flash'
 
 if menu == "Smart Assistant & Journal Evaluator":
     st.header("💬 Smart Assistant & 12-Point Journal Evaluator")
