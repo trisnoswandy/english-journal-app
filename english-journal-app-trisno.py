@@ -164,7 +164,8 @@ st.markdown("Platform Cerdas Pengembang Bahasa Inggris, Analisis Pasar, & Riset 
 if not api_key:
     st.info("💡 **Petunjuk:** Masukkan Gemini API Key Anda di sidebar sebelah kiri untuk mulai menggunakan fitur AI.")
 
-MODEL_NAME = 'gemini-2.5-flash'
+# Menggunakan model gemini-3.6-flash sesuai permintaan
+MODEL_NAME = 'gemini-3.6-flash'
 
 # 6. Fitur 1: Smart Assistant & Evaluator
 if menu == "💬 Smart Assistant & Evaluator":
@@ -175,11 +176,10 @@ if menu == "💬 Smart Assistant & Evaluator":
     col1, col2 = st.columns([1, 1])
     
     with col1:
-        # Menggunakan st.form agar tekan Enter langsung mengirimkan pesan
         with st.form(key="chat_form", clear_on_submit=False):
             user_input = st.text_input(
                 "📝 Pesan / Jurnal / Pertanyaan (Tekan Enter untuk Kirim):",
-                placeholder="Misal: Analisis saham BBCA hari ini... (lalu tekan Enter)"
+                placeholder="Misal: Analisis pergerakan pasar atau berita hari ini... (tekan Enter)"
             )
             submitted = st.form_submit_button("🚀 Kirim / Analisis Data")
             
@@ -189,19 +189,22 @@ if menu == "💬 Smart Assistant & Evaluator":
             image_preview = Image.open(uploaded_image)
             st.image(image_preview, caption="Preview Gambar SS", use_container_width=True)
     
-    # Eksekusi saat Form disubmit (baik via Enter maupun klik tombol)
     if submitted:
         if not api_key:
             st.error("⚠️ Silakan masukkan Gemini API Key di sidebar terlebih dahulu!")
         elif not user_input and not uploaded_image:
             st.warning("⚠️ Mohon masukkan pesan teks atau upload foto screenshot terlebih dahulu.")
         else:
-            with st.spinner("⚡ Memproses respons dengan Gemini 2.5 Flash..."):
+            with st.spinner("⚡ Memproses respons dengan Gemini 3.6 Flash..."):
                 try:
                     client = genai.Client(api_key=api_key)
                     
                     system_prompt = """
-                    Kamu adalah asisten AI pribadi yang cerdas, fleksibel, dan komunikatif bernama Gemini. Tugasmu adalah merespons input dari pengguna (Trisno) sesuai dengan niat pengiriman pesan:
+                    Kamu adalah asisten AI pribadi yang cerdas, akurat, dan komunikatif bernama Gemini. 
+
+                    [ATURAN UTAMA]:
+                    - Sebelum memberikan jawaban akhir, lakukan kroscek (pemeriksaan ulang) secara cermat terhadap kebenaran data, logika, dan kelengkapan informasi agar tidak ada kesalahan.
+                    - Jawablah secara akurat, lugas, dan sesuai niat pengguna.
 
                     [INSTRUKSI LOGIKA RESPON]:
                     1. JIKA pengguna mengirimkan draf jurnal harian, tulisan latihan bahasa Inggris, atau secara eksplisit meminta evaluasi jurnal:
@@ -256,7 +259,7 @@ if menu == "💬 Smart Assistant & Evaluator":
         with st.form(key="answer_form", clear_on_submit=False):
             user_answers = st.text_input(
                 "Tuliskan jawaban Anda di sini (Tekan Enter untuk Kirim):",
-                placeholder="Misal: Daily Micro-Question: I usually analyze stock trends... (lalu tekan Enter)"
+                placeholder="Misal: Jawaban soal 1: A... (lalu tekan Enter)"
             )
             answer_submitted = st.form_submit_button("✔️ Periksa Jawaban Saya")
         
@@ -277,7 +280,7 @@ if menu == "💬 Smart Assistant & Evaluator":
                         "{user_answers}"
 
                         Tugasmu:
-                        1. Evaluasi apakah jawaban pengguna sudah benar dan tepat.
+                        1. Kroscek dan evaluasi apakah jawaban pengguna sudah benar dan tepat.
                         2. Jika ada kesalahan tata bahasa atau jawaban soal yang keliru, berikan koreksi ramah beserta penjelasannya.
                         3. Berikan apresiasi dan skor jika sesuai.
                         """
@@ -335,4 +338,4 @@ elif menu == "🎬 AI Video Prompt Gen":
     st.markdown("</div>", unsafe_allow_html=True)
 
 # 9. Footer
-st.markdown("<div class='footer'>Developed with ⚡ by <b>Trisno Swandy Simanullang</b> | Powered by Gemini 2.5 Flash</div>", unsafe_allow_html=True)
+st.markdown("<div class='footer'>Developed with ⚡ by <b>Trisno Swandy Simanullang</b> | Powered by Gemini 3.6 Flash</div>", unsafe_allow_html=True)
