@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Custom CSS (Membersihkan Seluruh Glitch & Kotak Kosong Bawaan Streamlit)
+# 2. Custom CSS Bersih (Menghapus Semua Kotak Kosong Bawah & Atas)
 custom_css = """
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
@@ -33,8 +33,8 @@ custom_css = """
         color: #f1f5f9;
     }
 
-    /* Hilangkan total kontainer kosong bawaan Streamlit */
-    [data-testid="stVerticalBlock"] > div:empty,
+    /* Pembasmi Kotak & Container Kosong Streamlit */
+    div[data-testid="stVerticalBlock"] > div:empty,
     div[data-baseweb="notification"],
     .element-container:empty {
         display: none !important;
@@ -44,16 +44,16 @@ custom_css = """
         margin: 0 !important;
     }
 
-    /* Card Styling */
-    .pro-card {
-        background: rgba(15, 23, 42, 0.65);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(0, 255, 170, 0.2);
-        border-radius: 14px;
-        padding: 24px;
-        margin-bottom: 20px;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    /* Styling Form & Card Bawaan */
+    div[data-testid="stForm"] {
+        background: rgba(15, 23, 42, 0.65) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border: 1px solid rgba(0, 255, 170, 0.2) !important;
+        border-radius: 14px !important;
+        padding: 20px !important;
+        margin-bottom: 20px !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
     }
 
     /* Sidebar Styling */
@@ -139,6 +139,15 @@ custom_css = """
         margin-bottom: 12px;
     }
 
+    .response-card {
+        background: rgba(15, 23, 42, 0.65);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(0, 255, 170, 0.2);
+        border-radius: 14px;
+        padding: 24px;
+        margin: 20px 0;
+    }
+
     .footer {
         position: relative;
         margin-top: 40px;
@@ -180,7 +189,7 @@ with st.sidebar:
     st.markdown("👤 **Trisno Swandy Simanullang**")
     st.markdown("<span class='status-badge'>PRO PLATFORM ACTIVE</span>", unsafe_allow_html=True)
 
-# 5. Header Utama (Satu Komponen Rapi Tanpa Kotak Kosong)
+# 5. Header Utama
 st.markdown("<div class='brand-title'>🌴 Trisno's Intelligence Workspace</div>", unsafe_allow_html=True)
 st.markdown("<div class='brand-subtitle'>Platform Cerdas Pengembang Bahasa Inggris, Analisis Pasar, & Riset Perkebunan.</div>", unsafe_allow_html=True)
 
@@ -194,22 +203,22 @@ if menu == "💬 Smart Assistant & Evaluator":
     st.subheader("💬 Smart Assistant & 12-Point Journal Evaluator")
     st.caption("Ketik pertanyaan (saham, berita, riset) lalu tekan Enter untuk respon langsung.")
     
-    col1, col2 = st.columns([1, 1])
-    
-    with col1:
-        with st.form(key="chat_form", clear_on_submit=False):
+    with st.form(key="chat_form", clear_on_submit=False):
+        col1, col2 = st.columns([1, 1])
+        with col1:
             user_input = st.text_input(
                 "📝 Pesan / Pertanyaan (Tekan Enter untuk Kirim):",
                 placeholder="Misal: Apa kejadian penting kemarin? / Analisis saham BBCA... (tekan Enter)"
             )
-            submitted = st.form_submit_button("🚀 Kirim / Analisis Data")
-            
-    with col2:
-        uploaded_image = st.file_uploader("📷 Upload Foto / Screenshot (Opsional):", type=["png", "jpg", "jpeg"])
-        if uploaded_image:
-            image_preview = Image.open(uploaded_image)
-            st.image(image_preview, caption="Preview Gambar SS", use_container_width=True)
+        with col2:
+            uploaded_image = st.file_uploader("📷 Upload Foto / Screenshot (Opsional):", type=["png", "jpg", "jpeg"])
+        
+        submitted = st.form_submit_button("🚀 Kirim / Analisis Data")
     
+    if uploaded_image:
+        image_preview = Image.open(uploaded_image)
+        st.image(image_preview, caption="Preview Gambar SS", use_container_width=True)
+
     if submitted:
         if not api_key:
             st.error("⚠️ Silakan masukkan Gemini API Key di sidebar terlebih dahulu!")
@@ -224,7 +233,7 @@ if menu == "💬 Smart Assistant & Evaluator":
                     Kamu adalah asisten AI pribadi bernama Gemini. 
 
                     [INSTRUKSI UTAMA]:
-                    1. DILARANG BERTANYA BALIK ATAU MEMBERIKAN OPSI PILIHAN (seperti "Apakah Anda ingin berita A/B/C?").
+                    1. DILARANG BERTANYA BALIK ATAU MEMBERIKAN OPSI PILIHAN.
                     2. JAWAB LANGSUNG, CEPAT, RINGKAS, DAN AKURAT saat menerima pertanyaan. 
                     3. Jika pengguna bertanya hal umum (seperti "apa yang terjadi kemarin?"), LANGSUNG berikan rangkuman poin-poin peristiwa penting utama (Berita Nasional/Global & Pasar Finansial) tanpa meminta konfirmasi.
                     4. Lakukan kroscek data dan logika secara mandiri sebelum memberikan jawaban akhir.
@@ -252,19 +261,17 @@ if menu == "💬 Smart Assistant & Evaluator":
                 except Exception as e:
                     st.error(f"Terjadi kesalahan: {str(e)}")
 
-    # Tampilan Hasil Respons AI
+    # Tampilan Hasil Respons AI (Hanya Muncul Saat Ada Data)
     if st.session_state.eval_result:
-        st.markdown("<div class='pro-card'>", unsafe_allow_html=True)
+        st.markdown("<div class='response-card'>", unsafe_allow_html=True)
         st.markdown("### 🤖 Respons AI / Hasil Evaluasi")
         st.markdown(st.session_state.eval_result)
         st.markdown("</div>", unsafe_allow_html=True)
         
-        # Lembar Jawaban Interaktif
-        st.markdown("<div class='pro-card'>", unsafe_allow_html=True)
-        st.subheader("✍️ Lembar Jawaban Interaktif")
-        st.caption("Gunakan bagian ini untuk menjawab latihan soal atau Micro-Question dari hasil evaluasi di atas.")
-        
+        # Form Lembar Jawaban Interaktif
         with st.form(key="answer_form", clear_on_submit=False):
+            st.subheader("✍️ Lembar Jawaban Interaktif")
+            st.caption("Gunakan bagian ini untuk menjawab latihan soal atau Micro-Question dari hasil evaluasi di atas.")
             user_answers = st.text_input(
                 "Tuliskan jawaban Anda di sini (Tekan Enter untuk Kirim):",
                 placeholder="Misal: Jawaban soal 1: A... (lalu tekan Enter)"
@@ -302,25 +309,22 @@ if menu == "💬 Smart Assistant & Evaluator":
                         st.error(f"Terjadi kesalahan: {str(e)}")
                         
         if st.session_state.answer_feedback:
-            st.markdown("---")
+            st.markdown("<div class='response-card'>", unsafe_allow_html=True)
             st.markdown("### 📊 Hasil Penilaian & FeedBack")
             st.write(st.session_state.answer_feedback)
-        st.markdown("</div>", unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
 
 # 7. Fitur 2: Target Planner
 elif menu == "📈 Target & Learning Planner":
-    st.markdown("<div class='pro-card'>", unsafe_allow_html=True)
     st.subheader("📈 Target & Learning Planner")
     st.text_area(
         "Fokus & Target Belajar Utama:",
         "1. Analisis Pasar & Keuangan: Fundamental, Teknikal, P/E Ratios\n2. Riset Perkebunan: Patologi Tanaman & Biologi Tanah\n3. Statistik: Pengujian Hipotesis & Distribution Models",
         height=140
     )
-    st.markdown("</div>", unsafe_allow_html=True)
 
 # 8. Fitur 3: AI Video Prompt Gen
 elif menu == "🎬 AI Video Prompt Gen":
-    st.markdown("<div class='pro-card'>", unsafe_allow_html=True)
     st.subheader("🎬 AI Video Prompt Generator (Veo)")
     with st.form(key="video_form", clear_on_submit=False):
         prompt_input = st.text_input("Deskripsi Visual / Ide Kreatif (Tekan Enter untuk Kirim):", placeholder="Misal: Cinematic drone shot of oil palm plantation...")
@@ -343,7 +347,6 @@ elif menu == "🎬 AI Video Prompt Gen":
                     st.code(response.text, language="markdown")
                 except Exception as e:
                     st.error(f"Terjadi kesalahan: {str(e)}")
-    st.markdown("</div>", unsafe_allow_html=True)
 
 # 9. Footer
 st.markdown("<div class='footer'>Developed with ⚡ by <b>Trisno Swandy Simanullang</b> | Powered by Gemini 3.6 Flash</div>", unsafe_allow_html=True)
